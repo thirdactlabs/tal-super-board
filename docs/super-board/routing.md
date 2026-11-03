@@ -6,7 +6,7 @@ Pick the path by what you have. Every path ends in tickets. Then the number of t
 
 | You have | Do this |
 |---|---|
-| A clear idea | `/grill-me` → `/to-spec` → `/to-tickets` |
+| A clear idea | `/grill-me` → `/to-spec` → `/to-tickets`, or `/super-ticket` for one board-ready ticket |
 | A big, foggy idea, too big for one session | `/wayfinder` → `/to-spec` → `/to-tickets` |
 | Bugs and errors | `/super-collect` → findings doc → `/to-spec` → `/to-tickets` |
 

@@ -192,6 +192,36 @@ lacks "never Ready"               "$(cat "$GH_LOG")" "opt_Ready"
 
 has "labels collect:architecture" "$(cat "$GH_LOG")" "collect:architecture"
 
+echo "── a feature the user described (--source ticket)"
+is "ticket fp must start ticket|" 64 "$(run --type feature --source ticket --title T --body-file "$WORK/fix.md" --fingerprint "custom|x|y" >/dev/null; echo $?)"
+cat > "$WORK/feature.md" <<'MD'
+## Problem
+Shoppers cannot export receipts.
+## Context
+- **Where:** Receipts, `/receipts`
+  - a. Open `/receipts`
+  - b. Look for an export control
+- **Who:** any shopper
+## Fix
+Add an Export CSV button on the receipts page.
+## Acceptance Criteria
+- [ ] Clicking Export CSV downloads receipts.csv with one row per receipt.
+- [ ] A shopper with no receipts sees the button disabled.
+## Risk
+🟢 **Low** · one new read-only endpoint.
+## Blocked by
+- None.
+MD
+OUT=$(run --type feature --source ticket --title "Export receipts as CSV" --body-file "$WORK/feature.md" --fingerprint "ticket|export-receipts-csv" --area receipts --yes)
+is  "returns the new issue"   "412" "$OUT"
+is  "keeps the user's Blocked by, once" "1" "$(grep -c '^## Blocked by' "$BODY_LOG")"
+lacks "no QA-finding note on a user feature" "$(cat "$BODY_LOG")" "A QA finding reproduces"
+has "stamps the ticket fingerprint" "$(cat "$BODY_LOG")" "super-collect-fingerprint: ticket|export-receipts-csv"
+has "lands in Backlog"        "$(cat "$GH_LOG")" "opt_Backlog"
+has "labels source:ticket"    "$(cat "$GH_LOG")" "source:ticket"
+has "drops the QA filer's source:qa" "$(cat "$GH_LOG")" "--remove-label source:qa"
+lacks "not labelled source:collect" "$(cat "$GH_LOG")" "--add-label source:collect"
+
 echo "── posthog bug with extra labels (needs-triage, ux)"
 OUT=$(run --type bug --source posthog --title "Dead clicks on /checkout" --body-file "$WORK/bug.md" --fingerprint "posthog|dead_click|1a2b3c" --label needs-triage --label ux --yes)
 is  "returns the new issue"   "412" "$OUT"

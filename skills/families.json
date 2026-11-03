@@ -1,9 +1,10 @@
 {
   "you_type": {
-    "title": "You type — 5 skills",
+    "title": "You type — 6 skills",
     "skills": {
       "super-board": "Orchestrator: plans waves, runs Build → QA → Review, merges when green.",
       "super-collect": "Finds problems, verifies them, writes a findings doc for /to-spec and /to-tickets.",
+      "super-ticket": "Grills you on a feature, writes board-ready tickets, files them into Backlog.",
       "ui-refine-loop": "Critique → refine loop that polishes one page or component.",
       "visual": "One HTML page: branch recap, plan, or codebase map with diagrams.",
       "git-sync": "Commit per logical change, merge-pull, push without force, report."

@@ -8,7 +8,7 @@
 
 <p>Stop babysitting coding agents: cards you drop in Ready come back as tested, reviewed PRs.</p>
 
-<p>9 skills (5 you type, 4 the board runs) · 9 commands · 6 guard hooks</p>
+<p>10 skills (6 you type, 4 the board runs) · 10 commands · 6 guard hooks</p>
 
 <p>
 <img alt="Version" src="https://img.shields.io/badge/version-3.3.0-1f883d?style=flat-square">
@@ -103,15 +103,16 @@ Add cards to `Ready`. The board drains on its own.
 
 ## Skills
 
-**9 skills (5 you type, 4 the board runs).** Uses [Matt Pocock skills](https://github.com/mattpocock/skills), ponytail, impeccable, humanizer, [Anthropic's security review](https://github.com/anthropics/claude-code-security-review) and [Cloudflare's security-audit](https://github.com/cloudflare/security-audit-skill).
+**10 skills (6 you type, 4 the board runs).** Uses [Matt Pocock skills](https://github.com/mattpocock/skills), ponytail, impeccable, humanizer, [Anthropic's security review](https://github.com/anthropics/claude-code-security-review) and [Cloudflare's security-audit](https://github.com/cloudflare/security-audit-skill).
 
 <!-- skills:start -->
-**You type — 5 skills**
+**You type — 6 skills**
 
 | Skill | What it does |
 |---|---|
 | [`/super-board`](skills/super-board/README.md) | Orchestrator: plans waves, runs Build → QA → Review, merges when green. |
 | [`/super-collect`](skills/super-collect/README.md) | Finds problems, verifies them, writes a findings doc for /to-spec and /to-tickets. |
+| [`/super-ticket`](skills/super-ticket/README.md) | Grills you on a feature, writes board-ready tickets, files them into Backlog. |
 | [`/ui-refine-loop`](skills/ui-refine-loop/README.md) | Critique → refine loop that polishes one page or component. |
 | [`/visual`](skills/visual/README.md) | One HTML page: branch recap, plan, or codebase map with diagrams. |
 | [`/git-sync`](skills/git-sync/README.md) | Commit per logical change, merge-pull, push without force, report. |
@@ -137,6 +138,7 @@ Each name links to that skill's README. Adding a skill? Write its `SKILL.md` and
 /super-board run <slug>       # drain the board
 /super-board stop             # stop workers
 /super-collect [source]       # find problems → findings doc → /to-spec
+/super-ticket                 # describe a feature → board-ready ticket in Backlog
 /ui-refine-loop <route>       # polish one page
 /visual [recap|plan|path]     # one HTML page
 /git-sync                     # commit, pull, push

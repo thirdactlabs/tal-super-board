@@ -1,7 +1,7 @@
 # super-board — agent-facing notes
 
-This repo ships nine skills under `skills/`: five you type (`super-board`, `super-collect`,
-`ui-refine-loop`, `visual`, `git-sync`) and four the board runs (the lane workers `super-build`, `super-qa`,
+This repo ships ten skills under `skills/`: six you type (`super-board`, `super-collect`,
+`super-ticket`, `ui-refine-loop`, `visual`, `git-sync`) and four the board runs (the lane workers `super-build`, `super-qa`,
 `super-review`, plus `pr-security-review`, which super-qa runs on every PR). Cloudflare's
 `security-audit` is not shipped: get.sh and onboard fetch it with `npx skills`, and no lane runs it. Architecture findings come from `/super-collect architecture`.
 Worktree cleanup (`hooks/cleanup-wt.py`) is a hook, not a skill. README skill tables are generated
@@ -52,7 +52,7 @@ left alone; where no symlink can be made the file is copied. Settings and run st
 
 ```
 .agents/
-├── skills/<all nine>/...
+├── skills/<all ten>/...
 ├── hooks/guard-*.py, cleanup-wt.py   (wired into settings.json; --no-hooks skips)
 ├── workflows/super-board-wave.js, ui-refine-loop.js
 └── bin/super-board-*.sh (incl. pr-body), super-board-*.py (status, merge-policy, agents-md, settings, setup), super-qa-file-bug.sh, super-review-file-refactor.sh
