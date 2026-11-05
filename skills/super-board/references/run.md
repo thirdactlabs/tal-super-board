@@ -383,6 +383,8 @@ If a screenshot file is >5MB, downscale to ≤1920px wide before committing; Git
 
 ### Reviewer
 
+**`config.pr_review` is `"codex-bot"`:** steps 1, 2 and 5 below run as written; steps 3, 3b, 4, 6, 7 and the merge protocol are replaced by [codex-bot-review.md](codex-bot-review.md). Absent or `"gate"`: everything below as written.
+
 1. Worktree `.claude/worktrees/issue-<N>-review/` from current state of `issue-<N>-<slug>`.
 2. **Gate 1** — scan PR threads and their replies. [PR author notes](pr-author-notes.md)
    alone are explanations, not findings. Human questions or change requests in those

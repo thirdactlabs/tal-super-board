@@ -11,11 +11,12 @@
     }
   },
   "board_runs": {
-    "title": "The board runs — 4 skills",
+    "title": "The board runs — 5 skills",
     "skills": {
       "super-build": "Builder lane: worktree, smallest safe change, tests, draft PR.",
       "super-qa": "Tester lane: evidence, test-gap check, screenshots, or bounce to Build.",
       "super-review": "Reviewer lane: own hypotheses, remembers prior findings, merge gate.",
+      "super-pr-loop": "Codex-bot loop: verify, fix, defer, resolve each thread; the project's workflow merges.",
       "pr-security-review": "Security pass on every PR diff; super-qa runs it, findings fail QA."
     }
   }

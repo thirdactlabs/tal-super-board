@@ -1,6 +1,6 @@
 ---
 name: super-review
-description: Reviewer lane of the super-board pipeline and standalone PR/branch readiness review — forms its own hypotheses before reading the builder's summary, remembers prior findings and re-checks each with file:line proof, runs an adversarial truth-check on non-trivial diffs, and classes every finding (Gap, Bug, Verification miss, Scope drift, Over-engineering via `ponytail:ponytail-review`). Merges only through `super-board-merge-gate.sh`, pinned to the reviewed head SHA, and routes other fixes to Super Build or Super QA via the board. Use when the user says "Super Review", "review this branch", "review loop", "make sure this is merge-ready", "PR review", or asks for code, architecture, security, QA evidence, or release-readiness judgment.
+description: Reviewer lane of the super-board pipeline and standalone PR/branch readiness review — forms its own hypotheses before reading the builder's summary, remembers prior findings and re-checks each with file:line proof, runs an adversarial truth-check on non-trivial diffs, and classes every finding (Gap, Bug, Verification miss, Scope drift, Over-engineering via `ponytail:ponytail-review`). Merges through `super-board-merge-gate.sh` pinned to the reviewed head SHA (or, with `pr_review: "codex-bot"`, confirms the project's Codex merge workflow landed it), and routes other fixes to Super Build or Super QA via the board. Use when the user says "Super Review", "review this branch", "review loop", "make sure this is merge-ready", "PR review", or asks for code, architecture, security, QA evidence, or release-readiness judgment.
 ---
 
 
@@ -43,6 +43,10 @@ Accept any of these inputs:
 - `prior_report` — the previous review's findings on this PR (see "Review remembers"). Empty on a first review.
 
 If the input is ambiguous, default to reviewing the current branch against its upstream/base branch. Ask only when the base branch, PR, or target scope materially changes the result.
+
+## Codex-bot mode
+
+When the config says `"pr_review": "codex-bot"`, the Codex GitHub bot is the second reviewer and the project's own workflow merges. Follow [codex-bot-review.md](../super-board/references/codex-bot-review.md) instead of the independent pass, the truth-check and the merge gate, and drive the bot's threads with `/super-pr-loop`. Otherwise ignore this section.
 
 ## Review flow
 

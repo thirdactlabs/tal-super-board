@@ -8,7 +8,7 @@
 
 <p>Stop babysitting coding agents: cards you drop in Ready come back as tested, reviewed PRs.</p>
 
-<p>10 skills (6 you type, 4 the board runs) · 10 commands · 6 guard hooks</p>
+<p>11 skills (6 you type, 5 the board runs) · 10 commands · 6 guard hooks</p>
 
 <p>
 <img alt="Version" src="https://img.shields.io/badge/version-3.3.0-1f883d?style=flat-square">
@@ -103,7 +103,7 @@ Add cards to `Ready`. The board drains on its own.
 
 ## Skills
 
-**10 skills (6 you type, 4 the board runs).** Uses [Matt Pocock skills](https://github.com/mattpocock/skills), ponytail, impeccable, humanizer, [Anthropic's security review](https://github.com/anthropics/claude-code-security-review) and [Cloudflare's security-audit](https://github.com/cloudflare/security-audit-skill).
+**11 skills (6 you type, 5 the board runs).** Uses [Matt Pocock skills](https://github.com/mattpocock/skills), ponytail, impeccable, humanizer, [Anthropic's security review](https://github.com/anthropics/claude-code-security-review) and [Cloudflare's security-audit](https://github.com/cloudflare/security-audit-skill).
 
 <!-- skills:start -->
 **You type — 6 skills**
@@ -117,13 +117,14 @@ Add cards to `Ready`. The board drains on its own.
 | [`/visual`](skills/visual/README.md) | One HTML page: branch recap, plan, or codebase map with diagrams. |
 | [`/git-sync`](skills/git-sync/README.md) | Commit per logical change, merge-pull, push without force, report. |
 
-**The board runs — 4 skills**
+**The board runs — 5 skills**
 
 | Skill | What it does |
 |---|---|
 | [`/super-build`](skills/super-build/README.md) | Builder lane: worktree, smallest safe change, tests, draft PR. |
 | [`/super-qa`](skills/super-qa/README.md) | Tester lane: evidence, test-gap check, screenshots, or bounce to Build. |
 | [`/super-review`](skills/super-review/README.md) | Reviewer lane: own hypotheses, remembers prior findings, merge gate. |
+| [`/super-pr-loop`](skills/super-pr-loop/README.md) | Codex-bot loop: verify, fix, defer, resolve each thread; the project's workflow merges. |
 | [`/pr-security-review`](skills/pr-security-review/README.md) | Security pass on every PR diff; super-qa runs it, findings fail QA. |
 <!-- skills:end -->
 

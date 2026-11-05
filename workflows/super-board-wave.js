@@ -123,6 +123,7 @@ const REVIEW_MEMORY = [
   `Truth-check sub-agents get the fixed brief from super-review → "Adversarial mode", verbatim. After collecting, reclass any Over-engineering Blocker to Should fix; it never decides merge or bounce.`,
   // Merge policy + migrations live in the gate (run.md → Merge protocol step 5).
   `Merge only via super-board-merge-gate.sh. Exit 7 = merge_policy says a human merges (money/auth/schema/size): Blocked with the 🙋 template quoting its human-gate lines; To unblock = merge it yourself, or comment done to approve.`,
+  `Config pr_review "codex-bot": follow .claude/skills/super-board/references/codex-bot-review.md instead of the independent pass, truth-check and merge-gate lines; never gh pr merge, never the gate.`,
   `Exit 8 = 🙋 needs you (migration for a DB the robot may not touch, failed migrate, declared human step): Blocked with the 🙋 template, exact commands from its needs-you lines, label needs-you.`,
 ]
 
