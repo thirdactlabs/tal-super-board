@@ -345,7 +345,7 @@ for affected feature selection, actual host readiness and new run-owned proof.
 Record uncovered/stale optional coverage alongside ordinary issue AC checks.
 4b. **Test-gap check** (super-qa → "Test-gap check (after build)"): map every AC to unit / component / e2e tests, hunt edge cases, write the High gaps red-first. A High gap that needs app code changed → Fail (step 7) with the gap list. Medium/Low go in the handoff under `Test gaps (not written)`.
 4c. **Security pass** (super-qa → "Security pass (every PR)"): run `pr-security-review` on the PR's diff against its base. Each kept finding is a failing check → Fail (step 7) with a `[builder]` thread on its file:line. Skill missing → Block.
-5. Run the tests. Capture evidence to `docs/super-board/runs/issue-<N>-qa-v<N>/`. For UI/visual ACs, capture screenshots at the standard viewports (1920×1080 desktop, 1024×768 tablet, 375×667 mobile). Commit the screenshots to the issue branch BEFORE writing the comment (the markdown image URLs depend on the files being present on the branch).
+5. Run the tests (failures: see "Pre-existing failures" above). Capture evidence to `docs/super-board/runs/issue-<N>-qa-v<N>/`. For UI/visual ACs, capture screenshots at the standard viewports (1920×1080 desktop, 1024×768 tablet, 375×667 mobile). Commit the screenshots to the issue branch BEFORE writing the comment (the markdown image URLs depend on the files being present on the branch).
 6. **Pass** → commit test files + screenshots to same branch + push → tick the `ac` block with proof lines, write `visual` for UI, append a `history` row, rewrite `status` → `[qa] [report] ✅` PR comment with results + evidence path **+ inline screenshot embeds** (see "Screenshot embed format" below) → issue comment with the SAME inline screenshot embeds → move card QA → Review. Clean up worktree.
 7. **Fail** → leave failing ACs unchecked with the reason, append a `history` row, rewrite `status` → `[qa] [report] ❌` PR comment with per-AC expected/actual + repro file:line + evidence path + "what fixed should look like" **+ inline screenshot embeds of the broken state** → issue comment with the same inline screenshots (showing what's wrong) → increment rebuild counter → move card QA → Ready (label `loop:rebuild-N`). Clean up worktree.
 
@@ -381,6 +381,12 @@ If a screenshot file is >5MB, downscale to ≤1920px wide before committing; Git
 6. Commit + push. Verify ALL `[qa]` threads are resolved.
 7. Update `ac`, `history`, `status`; post `[qa] [report]` PR + issue comments. Move QA → Review. Clean up worktree.
 
+### Pre-existing failures (Tester and Reviewer reruns)
+
+A red check is **pre-existing** only when it is also red on the base. Confirm it: run just that failing test or command in a throwaway worktree of `origin/<base>` (`git worktree add --detach <tmp> origin/<base>`, remove it after). Red there too → pre-existing. Green there → new, even when the diff never touched that file (a changed helper can break an untouched caller).
+
+Pre-existing is not a Fail, a thread or a rebuild: list each on the `Did:` line as `pre-existing, unrelated: <test or file>` and carry on. A suite that passes once and fails once is flaky: find the cause, never rerun until green. Any doubt → treat it as new.
+
 ### Reviewer
 
 **`config.pr_review` is `"codex-bot"`:** steps 1, 2 and 5 below run as written; steps 3, 3b, 4, 6, 7 and the merge protocol are replaced by [codex-bot-review.md](codex-bot-review.md). Absent or `"gate"`: everything below as written.
@@ -411,7 +417,7 @@ If a screenshot file is >5MB, downscale to ≤1920px wide before committing; Git
    - Pull `issue-<N>-<slug>` into the review worktree.
    - Re-run the test command Tester used (recorded in Tester's PR handoff comment as `Local tests:` line).
    - Tests green → continue to step 6.
-   - Tests red → open new `[qa]`-prefixed PR thread quoting the failure output, move card Review → QA with `loop:rebuild-N`, exit. Tester wrote a broken suite; QA owns the fix.
+   - Tests red on a new failure (see "Pre-existing failures") → open new `[qa]`-prefixed PR thread quoting the failure output, move card Review → QA with `loop:rebuild-N`, exit. Tester wrote a broken suite; QA owns the fix.
 6. **Adversarial mode** (per `truth_gate`): when triggered, spawn 2 sub-agents in parallel:
    - **Code-grounder** — verify cited file:line still exists and matches claims.
    - **Historian** — `git blame` the changed lines, check for ADRs / prior incidents.

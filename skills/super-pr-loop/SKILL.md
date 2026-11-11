@@ -44,6 +44,7 @@ gh api --paginate repos/<owner>/<repo>/pulls/<PR>/comments --jq '[.[] | .id] | s
   - **Clean:** a `comments[]` entry containing `**Reviewed commit:**` whose sha prefix matches
     `headRefOid`. This is the comment `merge-after-codex-review.yml` reacts to. Clean means this
     comment on the current head AND no unresolved thread.
+  A findings review also quotes `**Reviewed commit:**`; only a `comments[]` entry counts as clean.
   Neither form on the head yet is **not clean**: wait.
 - **Wait with a background `sleep 300`, repeated.** Never `ScheduleWakeup` or `/loop`: they
   end a lane's turn and the orchestrator reads that as a failure. Stay in this agent.
@@ -82,7 +83,7 @@ its tests.
 
 ### 5 · One push per pass
 
-Run every `verify_commands` entry. Any failure → stop, do not push. Else
+Run every `verify_commands` entry. A **new** failure (run.md → "Pre-existing failures") → stop, do not push; a pre-existing one is noted in the thread reply and does not stop the pass. Else
 `git pull --rebase && git push`. The push re-triggers Codex; go back to 1.
 
 ## Stops
@@ -94,7 +95,7 @@ Run every `verify_commands` entry. Any failure → stop, do not push. Else
 | 3 fix passes pushed and Codex still raises real findings | `🛡 round-cap` |
 | A finding needs a human decision | `🙋 needs-decision` |
 | Neither a review nor a clean comment on the head after 12 minutes | `⏱ no-codex-review` (is the app on the repo, is `CODEX_REVIEW_TOKEN` set?) |
-| A suite fails after a fix | `🧪 tests`, nothing pushed |
+| A suite fails newly after a fix (not red on the base) | `🧪 tests`, nothing pushed |
 
 The lane turns a non-clean stop into a Blocked card using the block template. Standalone, print
 the reason and stop.

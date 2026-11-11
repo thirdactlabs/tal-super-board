@@ -55,6 +55,8 @@ Gate 1 thread scan) and 5 (test rerun) are unchanged.
      and card to QA, as in Reviewer step 5.
 3. **Sync with the base.** `git fetch origin && git merge origin/<base>` (never a force push).
    A conflict that is not mechanical → `loop:rebase`, per run.md → "The rebase pass".
+   The merge changed any file → rerun `verify_commands` once before the push; a new failure is handled
+   as in step 2 (pre-existing ones: run.md → "Pre-existing failures").
 4. **Raise the PR.** `git push`, then `gh pr ready <PR>`. The trigger workflow fires now.
 5. **Codex loop.** Before using the helper, `super-board-skills-ready.py --require super-pr-loop`. Run `/super-pr-loop <PR>` inline, in this agent. Never `ScheduleWakeup` or
    `/loop`. Its stops map to the board:
