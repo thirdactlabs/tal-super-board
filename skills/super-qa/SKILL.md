@@ -507,8 +507,9 @@ Builder's reasoning.
    `tdd-v2` where the repo has it), at the rung the localisation ladder picks. A new test
    that passes on its first run has not been seen to fail: break the guarded line, see
    red, restore it, see green; the mutation never reaches a commit. A High gap that needs
-   app code changed to pass or to become testable is a **Fail**: bounce to Builder
-   (QA → Ready) with the list (witness, expected, rung, target file). Medium and Low go
+   app code changed to pass: repair it in this lane (run.md → Tester step 5a). One that
+   needs a refactor to become testable, or that the repair cap leaves red, is a **Fail**:
+   bounce to Builder (QA → Ready) with the list (witness, expected, rung, target file). Medium and Low go
    in the handoff under `Test gaps (not written)` and never block.
 
 ## Security pass (every PR)
@@ -663,9 +664,10 @@ for affected selection, host readiness, real assertions and fresh proof.
 3b. Run the **Test-gap check** (above) against the Builder's diff; its High gaps join the plan.
 3c. Run the **Security pass** (above) on the PR's diff. Any kept finding → Fail (step 7).
 4. Run tests. Capture evidence to `docs/super-board/runs/issue-<N>-qa-v<N>/`. **For any UI-affecting issue, capture at least one screenshot per AC** (Playwright `page.screenshot` or `browse --screenshot`). Save with descriptive names: `ac1-<short-desc>.png`, not `screenshot1.png`.
+4a. **Repair new failures in this lane** (run.md → Tester step 5a: fix the test or the smallest product change within the ACs; 5 attempts unit/integration, 3 E2E; never loosen an assertion). Security findings, decisions beyond the ACs and failures still red after the cap go to step 7.
 5. **Commit the evidence directory** to the issue branch alongside test files (`git add docs/super-board/runs/issue-<N>-qa-v<N>/ && git commit && git push`). This is non-optional — without it, the inline image markdown in the issue comment won't render on GitHub.
 6. **Pass** → tick the PR's `ac` block with proof lines, write `visual` for UI, append a `history` row, rewrite `status` (`super-board-pr-body.sh`) → `[qa] [report] ✅` PR comment with results + evidence path → **issue comment with screenshot evidence** (see "Issue-comment evidence format" below) → move QA → Review. Clean up worktree.
-7. **Fail** → leave failing ACs unchecked with the reason, append a `history` row, rewrite `status` → `[qa] [report] ❌` PR comment with per-AC expected/actual + repro file:line + evidence path + "what fixed should look like" → issue comment with the failure screenshots → increment rebuild counter → move QA → Ready (label `loop:rebuild-N`). Clean up worktree.
+7. **Fail** (only after 4a, or on a security finding) → leave failing ACs unchecked with the reason, append a `history` row, rewrite `status` → `[qa] [report] ❌` PR comment with per-AC expected/actual + repro file:line + evidence path + "what fixed should look like" → issue comment with the failure screenshots → increment rebuild counter → move QA → Ready (label `loop:rebuild-N`). Clean up worktree.
 
 ### Optional project feature verifier
 
