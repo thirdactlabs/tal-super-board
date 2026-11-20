@@ -60,8 +60,8 @@ left alone; where no symlink can be made the file is copied. Settings and run st
 
 It also refreshes the managed `<!-- super-board:begin … -->` block in the target's AGENTS.md when
 one exists (nothing outside the markers), records an older install in
-`.claude/super-board/upgrade.json`, prints grouped emoji output, and asks nothing:
-`super-board onboard` asks the questions. Onboard's 🔍 Checks (`scripts/super-board-setup.py`)
+`.claude/super-board/upgrade.json`, prints grouped output, and asks nothing:
+`super-board onboard` asks the questions. Onboard's Checks (`scripts/super-board-setup.py`)
 fixes must-haves and finishes upgrades with no question.
 
 ## Board shape (v3.0.0)
@@ -81,10 +81,10 @@ every project it is installed in.
 
 | Thing | Format |
 |---|---|
-| Commit | `<emoji> [type] scope: subject` + short bullets (✨ feat · 🐛 fix · 🔧 chore · ♻️ refactor · 🧪 test · ⚡ perf · 📝 docs · 👷 ci · 💄 ui · 🔒 security · ⏪ revert · 🚧 wip) |
+| Commit | `[type] scope: subject` + short bullets (feat · fix · chore · refactor · test · perf · docs · ci · ui · security · revert · wip) |
 | PR body | marker blocks, one owner each: status · problem · solution · ac · history · visual · risk |
 | Ticket | Problem · Context · Fix · Acceptance Criteria · Risk · Blocked by (+ Evidence for bugs) |
-| Comment | `[role] [label] status` · Did · ✅ Done · ❌ Not done · Next · ≤ 8 lines |
+| Comment | `[role] [label] status` · Did · Done · Not done · Next · ≤ 8 lines |
 | PR author notes | Purpose · What changed · Why it matters, in native file/inline review comments; follow `skills/super-board/references/pr-author-notes.md` |
 
 - NEVER rewrite a whole PR body: `scripts/super-board-pr-body.sh` rewrites one block.

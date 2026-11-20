@@ -62,7 +62,7 @@ if [ -z "$ADOPT" ]; then
   case "$SOURCE" in
     sentry) FP_PREFIX="err|sentry|" ;; posthog) FP_PREFIX="posthog|" ;; github) FP_PREFIX="github|" ;;
     prs) FP_PREFIX="prs|" ;; architecture) FP_PREFIX="arch|" ;;
-    custom) FP_PREFIX="custom|" ;;   # onboard's "➕ Add another source": custom|<name>|<key>
+    custom) FP_PREFIX="custom|" ;;   # onboard's "Add another source": custom|<name>|<key>
     ticket) FP_PREFIX="ticket|" ;;   # /super-ticket: a feature the user described, ticket|<slug>
     *) die "--source must be sentry|posthog|github|prs|architecture|custom|ticket (got: ${SOURCE:-<unset>})" 64 ;;
   esac

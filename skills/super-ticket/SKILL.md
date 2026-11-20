@@ -44,14 +44,14 @@ before drafting.
 Write each body to a `mktemp` file, in the ticket-format.md shape (Problem · Context · Fix ·
 Acceptance Criteria · Risk · Blocked by). Then:
 
-- **Title:** the bare change, no emoji, kind or number (the filer adds `✨ [feat] <scope>:`).
+- **Title:** the bare change, no emoji, kind or number (the filer adds `[feat] <scope>:`).
   Keep it under 50 characters. Pass the scope as `--area`.
 - **Context:** `- **Where:**` then lettered steps, one per line, no arrows.
 - **Acceptance Criteria:** `- [ ]` lines, 2–5, each checkable.
 - **Blocked by:** `- #N — why` using only numbers from step 1, or exactly `- None.`. Put any
   explanation in a blockquote below, never on the bullet. A slice filed in this run is
   filed after its blocker so its number exists.
-- **Risk:** 🟢 / 🟡 / 🔴 plus one line.
+- **Risk:** low / medium / plus one line.
 - No secrets or user data. No `TBD`, `TODO:` or `<placeholder>` left in the text.
 
 ## 5 · Check before filing

@@ -6,7 +6,7 @@ It runs after you have read the target's code area (SKILL.md step 1) and before 
 
 - **At most 10 questions in total**, across all waves.
 - **Waves.** Wave 1 asks 3 questions. Ask a second wave (at most 4) only when the answers leave a decision open that would change what the fixers do. Ask a third (whatever is left of the 10) only when wave 2 opens something new. Most runs stop after wave 1 or 2.
-- **Every question accepts "you pick".** Each one ends with `➡️ <your recommended answer>`, grounded in what you read in the code. "You pick", "fine" or silence on a question means your recommendation stands.
+- **Every question accepts "you pick".** Each one ends with `<your recommended answer>`, grounded in what you read in the code. "You pick", "fine" or silence on a question means your recommendation stands.
 - **Facts are yours, decisions are Eric's.** Never ask what the code, `PRODUCT.md`, `DESIGN.md` or an existing taste file already answers. Look it up instead.
 - **Taste file exists?** Ask only about this target's goal and direction, and anything the file leaves open. Don't re-ask its rules.
 
@@ -31,4 +31,4 @@ Wave 2 and later, only when needed:
 
 ## Output: the taste and direction file
 
-Write the answers to the path `refine-setup.sh detect` printed as `tasteFile` (`refine.taste_file`, default `docs/design/taste.md`, one per project). If it doesn't exist yet, start from [`taste.md`](taste.md) (the neutral default) and fill in its **Direction** section. If it exists, add or replace this target's `### <target>` block under **Direction** and leave the rest alone. Record "you pick" answers as your recommendation, marked `(picked)`. The file is written inside the refine worktree and committed as the branch's first commit, `💄 [ui] <slug>: taste and direction`, so it reaches the PR for review.
+Write the answers to the path `refine-setup.sh detect` printed as `tasteFile` (`refine.taste_file`, default `docs/design/taste.md`, one per project). If it doesn't exist yet, start from [`taste.md`](taste.md) (the neutral default) and fill in its **Direction** section. If it exists, add or replace this target's `### <target>` block under **Direction** and leave the rest alone. Record "you pick" answers as your recommendation, marked `(picked)`. The file is written inside the refine worktree and committed as the branch's first commit, `[ui] <slug>: taste and direction`, so it reaches the PR for review.

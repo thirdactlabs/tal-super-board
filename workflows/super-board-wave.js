@@ -122,9 +122,9 @@ const REVIEW_MEMORY = [
   // Truth-check brief is fixed (super-review → Adversarial mode); a hand-written one once made over-building blocking.
   `Truth-check sub-agents get the fixed brief from super-review → "Adversarial mode", verbatim. After collecting, reclass any Over-engineering Blocker to Should fix; it never decides merge or bounce.`,
   // Merge policy + migrations live in the gate (run.md → Merge protocol step 5).
-  `Merge only via super-board-merge-gate.sh. Exit 7 = merge_policy says a human merges (money/auth/schema/size): Blocked with the 🙋 template quoting its human-gate lines; To unblock = merge it yourself, or comment done to approve.`,
-  `Config pr_review "codex-bot": follow .claude/skills/super-board/references/codex-bot-review.md instead of the independent pass, truth-check and merge-gate lines; never gh pr merge, never the gate.`,
-  `Exit 8 = 🙋 needs you (migration for a DB the robot may not touch, failed migrate, declared human step): Blocked with the 🙋 template, exact commands from its needs-you lines, label needs-you.`,
+  `Merge only via super-board-merge-gate.sh. Exit 7 = merge_policy says a human merges (money/auth/schema/size): Blocked with the template quoting its human-gate lines; To unblock = merge it yourself, or comment done to approve.`,
+  `Config pr_review "codex-bot": follow .claude/skills/super-board/references/codex-bot-review.md instead of the independent pass, truth-check and merge-gate lines; never gh pr merge, never the gate. The prior report (step 3b) is the marker comment on the issue; no PR exists before the lane raises it.`,
+  `Exit 8 = needs you (migration for a DB the robot may not touch, failed migrate, declared human step): Blocked with the template, exact commands from its needs-you lines, label needs-you.`,
 ]
 
 // GitHub budget (rate-limit-etiquette.md → "Price list"). Measured 2026-10-04: a
@@ -144,6 +144,11 @@ const SKILLS_CHECK = (cards, lane) => [
   `Load the exact resolved_path files. Only declared fallback IDs are allowed. Before using a conditional/custom helper repeat this CLI with --require <exact-name>.`,
 ].join('\n')
 
+// Config pr_review "codex-bot": no PR until the Reviewer raises it ready (codex-bot-review.md → "Before the PR").
+const NO_PR_YET = [
+  `Config pr_review "codex-bot": no PR exists before Review. Push the branch only and keep your reports, findings and proof on the issue, following .claude/skills/super-board/references/codex-bot-review.md → "Before the PR" in place of the PR steps in run.md. A PR that already exists for this branch is used as run.md says.`,
+]
+
 const lanePrompt = (lane, card) => [
   SKILLS_CHECK([card], lane),
   READ_FAILURE,
@@ -154,6 +159,7 @@ const lanePrompt = (lane, card) => [
   BOARD_IO(),
   `Commits, PR title, PR body blocks, comments: .claude/skills/super-board/references/writing-standard.md. Rewrite only your own PR body blocks, with .claude/bin/super-board-pr-body.sh.`,
   ...(lane === 'review' ? REVIEW_MEMORY : []),
+  ...(lane === 'build' || lane === 'qa' ? NO_PR_YET : []),
   ...(lane === 'qa' && card.status === 'Ready'
     ? [`This card is labelled qa: it skips Building. Move it Ready → QA yourself, create the issue branch from the base branch, and test what is already there (run.md → "qa cards").`]
     : []),

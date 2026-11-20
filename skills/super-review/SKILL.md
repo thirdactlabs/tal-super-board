@@ -46,7 +46,7 @@ If the input is ambiguous, default to reviewing the current branch against its u
 
 ## Codex-bot mode
 
-When the config says `"pr_review": "codex-bot"`, the Codex GitHub bot is the second reviewer and the project's own workflow merges. Follow [codex-bot-review.md](../super-board/references/codex-bot-review.md) instead of the independent pass, the truth-check and the merge gate, and drive the bot's threads with `/super-pr-loop`. Otherwise ignore this section.
+When the config says `"pr_review": "codex-bot"`, the Codex GitHub bot is the second reviewer and the project's own workflow merges. Follow [codex-bot-review.md](../super-board/references/codex-bot-review.md) instead of the independent pass, the truth-check and the merge gate, raise the PR ready (never a draft) after your own review, and drive the bot's threads with `/super-pr-loop`. Otherwise ignore this section.
 
 ## Review flow
 
@@ -98,7 +98,7 @@ When the config says `"pr_review": "codex-bot"`, the Codex GitHub bot is the sec
      Super Build — it **never blocks a merge on its own**. A simplification that would
      cut validation, security, data-loss protection or accessibility is not a finding.
    - **No issue** — you checked a hypothesis or claim and it holds. Not a finding: list it
-     on the report's `✅ Done` line with the file:line or command that showed it. Saying what is
+     on the report's `Done` line with the file:line or command that showed it. Saying what is
      right stops the next round re-litigating it.
 
    Severity:
@@ -116,7 +116,7 @@ When the config says `"pr_review": "codex-bot"`, the Codex GitHub bot is the sec
    - If a blocker is a functional regression, hand it to **Super QA**.
    - If a blocker is visual/design fidelity, file a UI ticket; a human can run `/ui-refine-loop` (the board never triggers it).
    - If it is a deepening opportunity, file it with `scripts/super-review-file-refactor.sh` and carry on to the merge decision. Do not open a PR thread for it; do not bounce the card.
-     `--title` is the bare problem: the filer adds the `♻️ [refactor] <scope>:` prefix, so never pass one.
+     `--title` is the bare problem: the filer adds the `[refactor] <scope>:` prefix, so never pass one.
      The `--body-file` uses the ticket format (writing-standard.md § 3): `## Problem`,
      `## Context` (`- **Where:**` the module and files), `## Fix` — the filer refuses a body
      without them. **Write real acceptance criteria too.** A card that carries an
@@ -147,16 +147,16 @@ remembers"); R-ids never change.
 
 ```markdown
 <!-- super-review:report -->
-[reviewer] [report] <✅ merge-ready | ❌ bounced | 🛑 blocked | 🙋 human-gated | ⚠️ unverified> · round <N>
+[reviewer] [report] <merge-ready | bounced | blocked | human-gated | unverified> · round <N>
 Did: <scope reviewed · base · verification command + result>
-✅ Done: <prior findings fixed, hypotheses that held — each with file:line or command>
-❌ Not done: <open findings by id, or what you could not verify and why>   (omit when nothing)
+Done: <prior findings fixed, hypotheses that held — each with file:line or command>
+Not done: <open findings by id, or what you could not verify and why>   (omit when nothing)
 Next: <builder | qa | Eric | none>
 
 | ID | Owner | Class | Where | Finding | Status |
 |---|---|---|---|---|---|
-| R1 | builder | Bug | `src/cart.py:12` | <finding> | ✅ fixed |
-| R2 | builder | Bug | `src/cart.py:31` | <finding> | ❌ not fixed |
+| R1 | builder | Bug | `src/cart.py:12` | <finding> | fixed |
+| R2 | builder | Bug | `src/cart.py:31` | <finding> | not fixed |
 | R3 | qa | Verification miss | `tests/test_cart.py:8` | <finding> · blocker | open |
 | R4 | builder | Over-engineering | `src/fmt.py:1` | <what it builds> → <smaller thing> · should fix, never blocks alone | open |
 ```
@@ -166,14 +166,14 @@ Next: <builder | qa | Eric | none>
 - Mark `blocker` or `should fix` in the Finding cell. Over-engineering is always `should fix`.
 - Deepening opportunities filed with `super-review-file-refactor.sh` get a row with Status
   `filed #<issue>`.
-- Human gates: the header says `🙋 human-gated` and `Next: Eric`; the decision goes in a row.
+- Human gates: the header says `human-gated` and `Next: Eric`; the decision goes in a row.
 
 For short summaries (wave reports), keep it phone-friendly:
 
 ```markdown
-[reviewer] [report] 🛑 blocked · PR #123
+[reviewer] [report] blocked · PR #123
 Did: `npm test -- --run imports` green
-❌ Not done: R1 functional bug → qa · R2 schema decision → Eric
+Not done: R1 functional bug → qa · R2 schema decision → Eric
 Next: qa
 ```
 
@@ -218,7 +218,7 @@ Outside super-board (no PR), `prior_report` is whatever earlier review the calle
   the builder's reply saying it was fixed; read the code.
 - `no longer applies` — the code it pointed at is gone, or the AC changed. Do not re-raise it.
 
-Any `not fixed` (other than Over-engineering, which never bounces alone) → **bounce again**: set those rows to `❌ not fixed`, keeping their
+Any `not fixed` (other than Over-engineering, which never bounces alone) → **bounce again**: set those rows to `not fixed`, keeping their
 original ids and owners. Skip the fresh pass; it would review code that is about to change.
 All clear → round 2 is the normal fresh pass. New findings take ids after the highest one used.
 
@@ -319,7 +319,7 @@ See `.claude/skills/super-board/references/run.md` → Reviewer. Summary of the 
    - Both open → bounce to whichever is older.
    - Clean up worktree, exit.
 3. Read PR + spot-check Tester evidence + read CLAUDE.md / AGENTS.md.
-   Check the Risk block against the diff: is the Door right (one-way: DROP, rename, data rewrite, public API, sent email) and the Blast radius honest? Fix it with `super-board-pr-body.sh --block risk`; a one-way door is never 🟢.
+   Check the Risk block against the diff: is the Door right (one-way: DROP, rename, data rewrite, public API, sent email) and the Blast radius honest? Fix it with `super-board-pr-body.sh --block risk`; a one-way door is never low.
    **3b. Prior-report check** — load `prior_report` (see "Review remembers"); if present, round 1 checks each prior finding; any `not fixed` → re-open its thread, bounce by prefix, post the report, exit.
 4. Review code + tests.
 5. **Reviewer-side test rerun (always — closes Tester self-verification gap):**
@@ -340,7 +340,7 @@ See `.claude/skills/super-board/references/run.md` → Reviewer. Summary of the 
    - **Over-engineering only** (from `ponytail:ponytail-review`, see super-review step 3) → list it in the report, open no thread, and carry on to the merge decision; it never bounces a card alone. When the card bounces for another finding anyway, open a `[builder]` thread for each Over-engineering finding too, so the rebuild trims it.
    - **Code-side new finding** → new `[builder]`-prefixed thread, move card Review → Ready (`loop:rebuild-N`).
    - **Test-side new finding** → new `[qa]`-prefixed thread, move card Review → QA (`loop:rebuild-N`).
-   - **Blocker finding (destructive schema, contract, money, auth, live-DB migration) or rebuild cap hit** → full §4 Block template, move card Review → Blocked. A *clean* PR that merely touches money, auth or schema is not a finding: run the merge protocol, and the gate's `merge_policy` hands it to a human (exit 7 → 🙋 Blocked).
+   - **Blocker finding (destructive schema, contract, money, auth, live-DB migration) or rebuild cap hit** → full §4 Block template, move card Review → Blocked. A *clean* PR that merely touches money, auth or schema is not a finding: run the merge protocol, and the gate's `merge_policy` hands it to a human (exit 7 → Blocked).
 8. Write the Reviewer report (marker `<!-- super-review:report -->`, ids on every finding) — edit the existing report comment in place, post a new one only on the first review. It is the next re-review's `prior_report`.
 9. Clean up worktree.
 
@@ -364,13 +364,13 @@ two complete builds. In order, no shortcuts:
      path or added-line keyword; a diff over `auto_max_lines`, default 400 — "big PR — please
      review"; `default: "human"`). `schema` means destructive only (DROP / TRUNCATE / RENAME);
      an additive migration follows `migrations.allowed_envs`, and a live DB is always human.
-     Card → **Blocked** with the 🙋 template: `Why blocked` quotes the gate's
+     Card → **Blocked** with the template: `Why blocked` quotes the gate's
      `human-gate:` lines; `To unblock` = review PR #<P> and merge it yourself, OR comment
      `done` to approve (the next wave re-runs the gate, which merges). Label `needs-you`.
-   - **Exit 8 — 🙋 needs you.** Migrations for a database outside
+   - **Exit 8 — needs you.** Migrations for a database outside
      `migrations.allowed_envs`, an allowed migrate command that failed, or a declared
-     human-only step. Card → **Blocked** with the 🙋 template
-     (`block-template.md` → "🙋 Needs you"), the gate's `needs-you:` commands copied
+     human-only step. Card → **Blocked** with the template
+     (`block-template.md` → "Needs you"), the gate's `needs-you:` commands copied
      verbatim into `To unblock`, label `needs-you`, `blocked-by: -`. After the human
      comments `done` after the current pinned request, the next wave verifies their
      permission and the head, then moves it to Review. Re-run the gate; labels do not
@@ -387,7 +387,7 @@ two complete builds. In order, no shortcuts:
    `gh pr view <PR> --json state,mergeCommit` must report `MERGED` plus a commit sha,
    and that sha must be an ancestor of the base branch
    (`git merge-base --is-ancestor <sha> origin/<base>`).
-4. Only then: close the issue, move card Review → **Done**, post the ✅ comment citing
+4. Only then: close the issue, move card Review → **Done**, post the comment citing
    the merge commit sha.
 5. Merge refused (failing checks, conflicts, branch protection) → card Review →
    **Blocked** with the §4 Block template naming the blocker. Never leave it in Review;
@@ -399,7 +399,7 @@ without a confirmed merge makes a runaway look like a healthy run.
 
 ### Prefix discipline
 - Every new review thread Reviewer writes MUST start with its owner lane — `[builder]`, `[qa]`, or `[reviewer]` — then a label: `[blocker]`, `[issue]`, `[suggestion]`, `[nit]`, `[question]`, `[praise]` (writing-standard.md § 4). Older PRs may carry `[QA]` / `[review]`; read them as `[qa]` / `[reviewer]`.
-- Unprefixed **top-level** human PR comments → treat as 🧑 Block reason. Move card Review → Blocked with the full §4 template.
+- Unprefixed **top-level** human PR comments → treat as Block reason. Move card Review → Blocked with the full §4 template.
 - Inline human review-thread replies → context only, no Block.
 
 ### `super-truth` is folded into super-review
@@ -449,7 +449,7 @@ sub-agents'.
 **Aggregation rule: take the MINIMUM of the two scores.** Rationale: one strong skeptic should be enough to block.
 
 Compare aggregate to `config.truth_threshold` (default `70`):
-- **Below threshold** → Reviewer MUST NOT approve. Open `[reviewer]`-prefixed PR thread quoting the lowest-confidence sub-agent finding. Write the full §4 Block template comment. Move card Review → Blocked with reason 🛡 truth-check failed (confidence X/100). The bot's "Why I cannot decide" line names the specific sub-agent finding it could not confirm.
+- **Below threshold** → Reviewer MUST NOT approve. Open `[reviewer]`-prefixed PR thread quoting the lowest-confidence sub-agent finding. Write the full §4 Block template comment. Move card Review → Blocked with reason truth-check failed (confidence X/100). The bot's "Why I cannot decide" line names the specific sub-agent finding it could not confirm.
 - **Above threshold** → continue to approval decision.
 
 ### Block/Skip exits use the §4 mandatory template

@@ -7,7 +7,7 @@
 | Where | When | Who |
 |---|---|---|
 | Blocked | Card needs human action, or waits on another card | Any lane, from any workflow column |
-| Done (closed as not planned) | Card dropped on purpose: out of scope, won't do | Any lane; 🤷 comment below |
+| Done (closed as not planned) | Card dropped on purpose: out of scope, won't do | Any lane; comment below |
 
 Once moved, the card waits. **A card blocked only on other cards no longer waits for a human:**
 the wave planner sweeps `Blocked` at the start of every wave, and any card whose `## Blocked by`
@@ -20,13 +20,13 @@ record of what they were waiting for was English prose in a comment nobody re-re
 
 ## Required Block comment template (mandatory on every transition into Blocked)
 
-The bot must write a structured comment on **both the issue and the PR** (if a PR exists) explaining *why* it moved the card and *what it couldn't safely decide*. Exception: a 🙋 merge approval uses one canonical issue request below; the PR links to it without duplicating its machine lines. Format:
+The bot must write a structured comment on **both the issue and the PR** (if a PR exists) explaining *why* it moved the card and *what it couldn't safely decide*. Exception: a merge approval uses one canonical issue request below; the PR links to it without duplicating its machine lines. Format:
 
 ```
-[<role>] [blocker] 🛑 blocked · <reason emoji> <one-line reason>
+[<role>] [blocker] blocked · <reason tag> <one-line reason>
 Card:        #<N> <title>
 PR:          #<P> (if exists)
-Reason tag:  <emoji from table below>
+Reason tag:  <word from the table below>
 Why blocked: <concrete; 1 line — name the specific thing that is missing or wrong>
 Evidence:    <the command + output, file:line, or error that shows it — not a paraphrase>
 Checked:     <what the bot verified before blocking, so nobody re-checks it — or "-">
@@ -59,7 +59,7 @@ same rule: **prose above for the human, one parseable line below for the loop.**
 
 - `blocked-by: 32, 91` — this card returns to `Ready` the moment both close. The sweep does it.
 - `blocked-by: -` — nothing on this board clears it. It waits for a person, and the sweep leaves it
-  alone. Use this for every `🔐`, `💳`, `🔑`, `🧑`, `🎨` and `🙋` block.
+  alone. Use this for every `credentials`, `billing`, `access`, `human-review`, `design` and `needs-you` block.
 
 Write the numbers alone. **Never `blocked-by: none — but #26 must merge first`**: a line that says
 none and then names an issue is read as *no blocker* by the sweep and as *one blocker* by a human,
@@ -70,30 +70,30 @@ The same rule governs the issue body's `## Blocked by` section, which is where t
 a card has no block comment yet. Bullets of the form `- #N — why`, or a single `- None.` — nothing
 else parses.
 
-A card dropped on purpose uses the same template with the header `[<role>] [report] 🤷 dropped ·
+A card dropped on purpose uses the same template with the header `[<role>] [report] dropped ·
 <reason>`, replaces `Why blocked` with `Why dropped` and `What blocks` with `Why out of scope`, is
 closed as not planned (`gh issue close <N> --reason "not planned"`) and moves to Done.
 
-## Reason emoji vocabulary
+## Reason tag vocabulary
 
-| Emoji | Class                       | Examples                                                                 |
+| Tag   | Class                       | Examples                                                                 |
 |-------|-----------------------------|--------------------------------------------------------------------------|
-| 🔐    | Credentials / secrets       | missing API key, expired token, no test login                            |
-| 💳    | Billing / quota             | paid API rate-limit hit, free tier exhausted, requires plan upgrade      |
-| 🔑    | Permissions / access        | gh scope denied, org admin required, write access missing                |
-| ❓    | Ambiguity / spec gap        | two valid interpretations, AC contradicts PROJECT.md, dependency unclear |
-| 🛡    | Safety / destructive        | would drop a table, would push to prod, would rotate live secrets        |
-| 🧑    | Human review needed         | unresolved human PR comment, design decision, branding choice            |
-| 🤷    | Out-of-scope                | wrong project, deferred to other milestone, manual-only ticket           |
-| 📦    | Wrong-place                 | belongs on a different board / repo                                      |
-| 🎨    | Pure design                 | no measurable AC; needs design pass first                                |
-| 👯    | Duplicate                   | pre-flight: a merged PR already delivers it, or an open PR / card is building it |
-| ⏳    | Sequenced                   | pre-flight: an open PR touches the same files — waits on the issue that PR closes |
-| 🙋    | Needs you (human-only step) | merge gate exit 7 (merge_policy: money/auth/schema/size — review and merge it, or comment `done` to approve) or exit 8: a migration for a DB the robot may not touch, an allowed migrate command failed, a `needs-you:` step in the PR body, `migrations.human_steps` |
+| credentials    | Credentials / secrets       | missing API key, expired token, no test login                            |
+| billing    | Billing / quota             | paid API rate-limit hit, free tier exhausted, requires plan upgrade      |
+| access    | Permissions / access        | gh scope denied, org admin required, write access missing                |
+| unclear    | Ambiguity / spec gap        | two valid interpretations, AC contradicts PROJECT.md, dependency unclear |
+| safety    | Safety / destructive        | would drop a table, would push to prod, would rotate live secrets        |
+| human-review    | Human review needed         | unresolved human PR comment, design decision, branding choice            |
+| out-of-scope    | Out-of-scope                | wrong project, deferred to other milestone, manual-only ticket           |
+| wrong-place    | Wrong-place                 | belongs on a different board / repo                                      |
+| design    | Pure design                 | no measurable AC; needs design pass first                                |
+| duplicate    | Duplicate                   | pre-flight: a merged PR already delivers it, or an open PR / card is building it |
+| sequenced    | Sequenced                   | pre-flight: an open PR touches the same files — waits on the issue that PR closes |
+| needs-you    | Needs you (human-only step) | merge gate exit 7 (merge_policy: money/auth/schema/size — review and merge it, or comment `done` to approve) or exit 8: a migration for a DB the robot may not touch, an allowed migrate command failed, a `needs-you:` step in the PR body, `migrations.human_steps` |
 
-## 🙋 Needs you — a command only a human may run
+## Needs you — a command only a human may run
 
-There is no "Needs you" column: the card goes to **Blocked**, tagged 🙋, with the `needs-you`
+There is no "Needs you" column: the card goes to **Blocked**, tagged needs-you, with the `needs-you`
 label on the issue and the PR. Use it whenever the next step is a command the robot must not run
 itself — the merge gate's exit 7 (merge_policy routes the merge to a human: review and merge
 it yourself, or comment `done` to approve and let the next wave merge it) and exit 8 (migrations against a database outside `migrations.allowed_envs`,
@@ -105,7 +105,7 @@ Merge gate exit 7 (a human merges) has one item before `done`: `- [ ] Review and
 that policy hold too: the approval covers those human steps as well as the code.
 
 ```
-[reviewer] [blocker] 🙋 Your turn on #<N> — <title>
+[reviewer] [blocker] Your turn on #<N> — <title>
 - [ ] Run `<exact command 1, copy-paste ready>` on the **<env>** database
 - [ ] <exact command 2, if any>
 - [ ] Comment `done` here
@@ -116,7 +116,7 @@ After a trusted human confirms this version, the next wave returns it to Review 
 PR #<P> <one line — e.g. "adds prisma/migrations/0042_add_plan">. <env> isn't in the databases the robot may migrate.
 Tests green on <base>@<sha>; migrated <test, staging>.
 Evidence: <the gate's `needs-you:` lines, verbatim>
-Reason tag: 🙋 needs you · Owner: <Eric | repo admin>
+Reason tag: needs-you · Owner: <Eric | repo admin>
 approval-request: <copy the gate's exact JSON here>
 blocked-by: -
 </details>
@@ -124,7 +124,7 @@ blocked-by: -
 
 Example (what the person sees on GitHub):
 
-> **🙋 Your turn on #812 — Add plan column**
+> **Your turn on #812 — Add plan column**
 > - [ ] Run `npx prisma migrate deploy` on the **live** database
 > - [ ] Comment `done` here
 >
@@ -144,7 +144,7 @@ issue comment. It records the full PR head and the exact policy/human steps bein
 confirmed. The issue must be linked by the PR's closing reference (`Closes #N`).
 For a standalone PR, post the canonical request on the PR instead. Keep a single
 request location: the PR's status comment links to the issue request and does not
-repeat `Reason tag: 🙋` or `approval-request:`. Never edit a request after posting;
+repeat `Reason tag: needs-you` or `approval-request:`. Never edit a request after posting;
 post a new one when the code, steps or actual human question changes. Do not
 repost the same pending request on every poll or retry. Generic credential or
 product blocks without a PR remain manual; a bare `done` does not automate them.

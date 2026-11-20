@@ -18,12 +18,10 @@ ROOT = Path(__file__).resolve().parent.parent
 REF = ROOT / "skills" / "super-board" / "references"
 STANDARD = (REF / "writing-standard.md").read_text(encoding="utf-8")
 
-EMOJI = {
-    "feat": "✨", "fix": "🐛", "chore": "🔧", "refactor": "♻️", "test": "🧪", "perf": "⚡",
-    "docs": "📝", "ci": "👷", "ui": "💄", "security": "🔒", "revert": "⏪", "wip": "🚧",
-}
+TYPES = ["feat", "fix", "chore", "refactor", "test", "perf", "docs", "ci", "ui", "security", "revert", "wip"]
+TITLE_SHAPE = re.compile(r"^\[[a-z]+\] [a-z0-9][a-z0-9._/-]*: \S")
 SUBJECT = re.compile(
-    r"^(?P<emoji>✨|🐛|🔧|♻️|🧪|⚡|📝|👷|💄|🔒|⏪|🚧) \[(?P<type>feat|fix|chore|refactor|test|perf|docs|ci|ui|security|revert|wip)\] "
+    r"^\[(?P<type>feat|fix|chore|refactor|test|perf|docs|ci|ui|security|revert|wip)\] "
     r"[a-z0-9][a-z0-9._/-]*: \S"
 )
 COMMENT_HEADER = re.compile(
@@ -40,7 +38,7 @@ PR_BLOCKS = ["status", "problem", "solution", "ac", "history", "visual", "risk"]
 
 def subject_ok(s: str) -> bool:
     m = SUBJECT.match(s)
-    return bool(m) and EMOJI[m["type"]] == m["emoji"] and len(s) <= 72
+    return bool(m) and len(s) <= 72
 
 
 def fenced(text: str) -> list[str]:
@@ -51,19 +49,19 @@ def fenced(text: str) -> list[str]:
 
 def test_subject_regex():
     good = [
-        "🐛 [fix] receipts: show a size error over 10 MB",
-        "🔧 [chore] loop: close #42 — stream replies",
-        "🚧 [wip] loop: #42 partial — schema only",
-        "🧪 [test] super-qa: iter 3 (2 bugs, 9 items, 1 PRs opened)",
-        "💄 [ui] reports: before/after screenshots",
+        "[fix] receipts: show a size error over 10 MB",
+        "[chore] loop: close #42 — stream replies",
+        "[wip] loop: #42 partial — schema only",
+        "[test] super-qa: iter 3 (2 bugs, 9 items, 1 PRs opened)",
+        "[ui] reports: before/after screenshots",
     ]
     bad = [
         "fix(receipts): show a size error",          # conventional commits
-        "🐛 fix receipts: show a size error",          # no brackets
-        "✨ [fix] receipts: show a size error",        # emoji does not match type
-        "🐛 [bugfix] receipts: show a size error",     # unknown type
-        "🐛 [fix] Receipts: show a size error",        # scope not lowercase
-        "🐛 [fix] receipts: " + "x" * 80,              # too long
+        "fix receipts: show a size error",             # no brackets
+        "🐛 [fix] receipts: show a size error",        # an emoji prefix is not allowed
+        "[bugfix] receipts: show a size error",        # unknown type
+        "[fix] Receipts: show a size error",           # scope not lowercase
+        "[fix] receipts: " + "x" * 80,                 # too long
     ]
     for s in good:
         assert subject_ok(s), f"should pass: {s}"
@@ -71,20 +69,20 @@ def test_subject_regex():
         assert not subject_ok(s), f"should fail: {s}"
 
 
-def test_emoji_map_matches_standard():
-    rows = dict((t, e) for e, t in re.findall(r"^\| (\S+) \| `([a-z]+)` \|", STANDARD, flags=re.M))
-    assert rows == EMOJI, f"writing-standard.md emoji table drifted: {rows}"
+def test_type_table_matches_standard():
+    rows = re.findall(r"^\| `([a-z]+)` \|", STANDARD, flags=re.M)
+    assert [r for r in rows if r in TYPES] == TYPES, f"writing-standard.md type table drifted: {rows}"
     claude_md = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
-    for t, e in EMOJI.items():
-        assert f"{e} {t}" in claude_md, f"CLAUDE.md writing table lacks '{e} {t}'"
+    for t in TYPES:
+        assert t in claude_md, f"CLAUDE.md writing table lacks '{t}'"
 
 
 def test_standard_examples_are_valid_subjects():
     seen = 0
     for block in fenced(STANDARD):
         first = block.splitlines()[0] if block.strip() else ""
-        if re.match(r"^[^\s\[<]\S* \[[a-z]+\] ", first):
-            if re.match(r"^\S+ \[(bug|feat|ui|test|docs|refactor|security)\] ", first) and "## Problem" in block:
+        if TITLE_SHAPE.match(first):
+            if re.match(r"^\[(bug|feat|ui|test|docs|refactor|security)\] ", first) and "## Problem" in block:
                 continue  # a ticket title, checked below
             assert subject_ok(first), f"example subject is off-standard: {first}"
             seen += 1
@@ -102,9 +100,10 @@ def test_dispatcher_greps_the_standard_loop_subjects():
                            capture_output=True, text=True)
         return r.returncode == 0
 
-    assert grep(close_pat, "🔧 [chore] loop: close #42 — add streaming")
-    assert not grep(close_pat, "🔧 [chore] loop: close #421 — other card")
-    assert grep(wip_pat, "🚧 [wip] loop: #42 partial — schema only")
+    assert grep(close_pat, "[chore] loop: close #42 — add streaming")
+    assert grep(close_pat, "🔧 [chore] loop: close #42 — older emoji subject")
+    assert not grep(close_pat, "[chore] loop: close #421 — other card")
+    assert grep(wip_pat, "[wip] loop: #42 partial — schema only")
     assert grep(close_pat, "chore(loop): close #42 — legacy branch")
 
 
@@ -145,9 +144,9 @@ def test_bug_filer_matches_the_standard():
 
 
 def test_ticket_title_shape():
-    title = re.compile(r"^(🐛 \[bug\]|✨ \[feat\]|💄 \[ui\]|🧪 \[test\]|📝 \[docs\]|♻️ \[refactor\]|🔒 \[security\]) [a-z0-9][a-z0-9._/-]*: \S")
-    assert title.match("🐛 [bug] receipts: spinner never stops over 10 MB")
-    assert not title.match("🐛 Bug /imports — CSV upload silently drops rows")
+    title = re.compile(r"^(\[bug\]|\[feat\]|\[ui\]|\[test\]|\[docs\]|\[refactor\]|\[security\]) [a-z0-9][a-z0-9._/-]*: \S")
+    assert title.match("[bug] receipts: spinner never stops over 10 MB")
+    assert not title.match("Bug /imports — CSV upload silently drops rows")
     src = (ROOT / "scripts" / "super-qa-file-bug.sh").read_text(encoding="utf-8")
     assert 'FULL_TITLE="${BADGE} ${SCOPE}: ${TITLE}"' in src
 
@@ -155,11 +154,11 @@ def test_ticket_title_shape():
 # ── comment ──────────────────────────────────────────────────────────────────
 
 def test_comment_header_regex():
-    assert COMMENT_HEADER.match("[qa] [report] ❌ failing · round 1")
-    assert COMMENT_HEADER.match("[reviewer] [blocker] 🛑 blocked · 🔐 missing key")
-    assert not COMMENT_HEADER.match("🔍 super-board · QA fail · v1")
-    assert not COMMENT_HEADER.match("[QA] [report] ❌ failing")
-    assert not COMMENT_HEADER.match("[qa] [fyi] ❌ failing")
+    assert COMMENT_HEADER.match("[qa] [report] failing · round 1")
+    assert COMMENT_HEADER.match("[reviewer] [blocker] blocked · credentials missing key")
+    assert not COMMENT_HEADER.match("super-board · QA fail · v1")
+    assert not COMMENT_HEADER.match("[QA] [report] failing")
+    assert not COMMENT_HEADER.match("[qa] [fyi] failing")
 
 
 def test_comment_examples_follow_the_header():
@@ -180,7 +179,7 @@ def test_comment_examples_follow_the_header():
                 author_notes += 1
                 continue
             lines = [l for l in lines if not l.startswith("<!-- super-review:report")]
-            if not lines or not re.match(r"^\[[a-z<]", lines[0]) or lines[0].startswith("[<"):
+            if not lines or not re.match(r"^\[[a-z<]", lines[0]) or lines[0].startswith("[<") or TITLE_SHAPE.match(lines[0]):
                 continue
             assert COMMENT_HEADER.match(lines[0]), f"bad comment header: {lines[0]}"
             prose = [l for l in lines if not machine.match(l)]
@@ -200,16 +199,16 @@ def test_block_template_uses_the_header():
 
 
 def test_needs_you_comment_is_checklist_first():
-    """The 🙋 comment shows what to do first; why and evidence fold away; the planner's lines stay."""
+    """The needs-you comment shows what to do first; why and evidence fold away; the planner's lines stay."""
     text = (REF / "block-template.md").read_text(encoding="utf-8")
-    block = next(b for b in fenced(text) if "🙋 Your turn on" in b)
+    block = next(b for b in fenced(text) if "Your turn on" in b)
     lines = block.splitlines()
-    assert re.match(r"^\[reviewer\] \[blocker\] 🙋 Your turn on #<N> — ", lines[0]), lines[0]
+    assert re.match(r"^\[reviewer\] \[blocker\] Your turn on #<N> — ", lines[0]), lines[0]
     assert lines[1].startswith("- [ ] "), "the first line after the header is a checklist item"
     assert any(l == "- [ ] Comment `done` here" for l in lines), "the checklist ends with: comment done"
     fold = block.index("<details><summary>Why, and what I checked</summary>")
     assert block.index("- [ ] ") < fold, "checklist before the fold"
-    assert re.search(r"Reason tag:[^\n]*🙋", block[fold:]), "deps.sh reads 'Reason tag: 🙋'"
+    assert re.search(r"Reason tag:[ \t]*needs-you", block[fold:]), "deps.sh reads 'Reason tag: needs-you'"
     assert re.search(r"^blocked-by: -$", block[fold:], flags=re.M), "deps.sh reads 'blocked-by: -'"
 
 
@@ -241,12 +240,12 @@ def test_history_is_folded_and_needs_you_sits_in_the_status_alert():
 def test_risk_names_door_and_blast_radius():
     """Risk carries the merge danger: a two-way or one-way door and a blast radius."""
     run_md = (REF / "run.md").read_text(encoding="utf-8")
-    std_risk = next(b for b in fenced(STANDARD) if b.startswith("## Risk\n🟢"))
+    std_risk = next(b for b in fenced(STANDARD) if b.startswith("## Risk\n**Low**"))
     run_risk = run_md[run_md.index("<!-- sb:risk -->\n## Risk"):run_md.index("<!-- /sb:risk -->")]
     for name, risk in (("writing-standard.md", std_risk), ("run.md", run_risk)):
         assert "**Door:**" in risk, f"{name} Risk lacks Door"
         assert "**Blast radius:**" in risk, f"{name} Risk lacks Blast radius"
-    assert "one-way door is never 🟢" in STANDARD
+    assert "one-way door is never low" in STANDARD
 
 
 def test_status_alerts():

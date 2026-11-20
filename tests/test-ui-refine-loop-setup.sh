@@ -142,7 +142,7 @@ for l in round-0 round-2; do for v in desktop mobile; do for t in light dark; do
 git rev-parse HEAD > "$RUNG/base"; BASE7=$(git rev-parse --short HEAD)
 TABLE=$(bash "$PRSHOTS" --worktree "$G" --run "$RUNG" --slug reports --final round-2)
 SHA=$(git rev-parse HEAD)
-is "shots committed"         '💄 [ui] reports: before/after screenshots' "$(git log -1 --format=%s)"
+is "shots committed"         '[ui] reports: before/after screenshots' "$(git log -1 --format=%s)"
 grep -q "| | Before \`$BASE7\` | After \`$BASE7\` (round-2) |" <<<"$TABLE" && ok "header names both shas" || bad "header names both shas" "Before \`$BASE7\` | After \`$BASE7\`" "$(head -1 <<<"$TABLE")"
 is "8 images on the branch"  '8'                                       "$(git ls-files docs/ui-refine/reports | wc -l | tr -d ' ')"
 grep -q "https://github.com/acme/app/raw/$SHA/docs/ui-refine/reports/before-desktop-light.png" <<<"$TABLE" && ok "raw URL pinned to sha" || bad "raw URL pinned to sha" "github raw link" "$TABLE"

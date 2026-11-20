@@ -72,7 +72,7 @@ Layout that reads well:
 - For **explore**, use one overview diagram, plus one per interesting flow.
 - Edges run forward (higher `col`) wherever possible; back-edges route around the side and read worse.
 
-Every document diagram also gets the camera: drag to pan, pinch or Ctrl/⌘ + scroll to zoom, `+ − 0` on the focused canvas, and ⛶ for full screen.
+Every document diagram also gets the camera: drag to pan, pinch or Ctrl/⌘ + scroll to zoom, `+ − 0` on the focused canvas, and for full screen.
 
 ## Map model (`render --map`)
 

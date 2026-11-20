@@ -1,6 +1,6 @@
 # Requests a Codex review once a PR is ready for review and on every push after that.
-# Drafts are skipped on purpose: the Builder opens a draft, and the Review lane marks it
-# ready only after its own pre-Codex review. The project's own merge-after-codex-review workflow
+# Drafts are skipped as a safety net: the Review lane raises the PR already ready, after its own
+# pre-Codex review, so none should exist. The project's own merge-after-codex-review workflow
 # reacts to the result. Installed by .claude/bin/super-board-codex-bot-install.sh. Needs the
 # CODEX_REVIEW_TOKEN secret.
 name: Codex Review Trigger

@@ -18,8 +18,7 @@ One PR per run. Several PRs → refuse and name the one to start with.
    `gh pr ready <PR>` (a draft is never reviewed or merged).
 2. The Codex trigger exists: `git ls-files .github/workflows | xargs grep -l '@codex review'`.
    None → stop with "run `.claude/bin/super-board-codex-bot-install.sh --config <cfg>` first".
-   A trigger that fires on drafts is a problem: see codex-bot-review.md → "The project's workflows".
-   **Never post `@codex review` yourself**; the workflow does it on every push.
+    **Never post `@codex review` yourself**; the workflow does it on every push.
 3. Pick the config in `.claude/super-board/configs/`. Its `verify_commands` are the suites to
    run before every push.
 4. **Never merge, never push to the base branch.** Fix commits go to the PR's own branch.
@@ -43,13 +42,15 @@ gh api --paginate repos/<owner>/<repo>/pulls/<PR>/comments --jq '[.[] | .id] | s
     plus inline threads.
   - **Clean:** a `comments[]` entry containing `**Reviewed commit:**` whose sha prefix matches
     `headRefOid`. This is the comment `merge-after-codex-review.yml` reacts to. Clean means this
-    comment on the current head AND no unresolved thread.
+    comment on the current head AND no unresolved thread on the worklist above.
   A findings review also quotes `**Reviewed commit:**`; only a `comments[]` entry counts as clean.
   Neither form on the head yet is **not clean**: wait.
 - **Wait with a background `sleep 300`, repeated.** Never `ScheduleWakeup` or `/loop`: they
   end a lane's turn and the orchestrator reads that as a failure. Stay in this agent.
 - Always `--paginate`. Diff comment ids against the last pass, never counts.
-- Worklist = every unresolved thread, bot or human (paginated GraphQL, `isResolved`).
+- Worklist = every unresolved thread, bot or human (paginated GraphQL, `isResolved`), except a
+  thread whose only comment is the lane's own author note (first line `<!-- super-board:author-note`)
+  with no reply from anyone else: it explains a file, it is not a finding. A reply makes it work.
 
 ### 2 · Verify
 
@@ -92,10 +93,10 @@ Run every `verify_commands` entry. A **new** failure (run.md → "Pre-existing f
 |---|---|
 | `MERGED` | report it; the lane confirms the commit on the base branch |
 | Clean: the bot's clean comment is on the current head and no thread is unresolved; PR still `OPEN` | report clean; the project's merge workflow takes over |
-| 3 fix passes pushed and Codex still raises real findings | `🛡 round-cap` |
-| A finding needs a human decision | `🙋 needs-decision` |
-| Neither a review nor a clean comment on the head after 12 minutes | `⏱ no-codex-review` (is the app on the repo, is `CODEX_REVIEW_TOKEN` set?) |
-| A suite fails newly after a fix (not red on the base) | `🧪 tests`, nothing pushed |
+| 3 fix passes pushed and Codex still raises real findings | `round-cap` |
+| A finding needs a human decision | `needs-decision` |
+| Neither a review nor a clean comment on the head after 12 minutes | `no-codex-review` (is the app on the repo, is `CODEX_REVIEW_TOKEN` set?) |
+| A suite fails newly after a fix (not red on the base) | `tests`, nothing pushed |
 
 The lane turns a non-clean stop into a Blocked card using the block template. Standalone, print
 the reason and stop.

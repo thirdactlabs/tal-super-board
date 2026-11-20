@@ -8,7 +8,7 @@
 #
 # Copies <run>/shots/round-0-<state>-<viewport>-<theme>.png and the --final
 # label's matching shots to <wt>/docs/ui-refine/<slug>/{before,after}-<viewport>-<theme>.png,
-# commits them as "💄 [ui] <slug>: before/after screenshots", and prints the
+# commits them as "[ui] <slug>: before/after screenshots", and prints the
 # Before | After table on stdout (writing-standard.md § 2: two columns, one row
 # per viewport and theme, both shas in the header — before = <run>/base, after =
 # the code the final shots show). The links resolve once the branch is pushed.
@@ -62,7 +62,7 @@ AFTER_SHA=$(short HEAD)
 if [ "$COMMIT" = 1 ]; then
   git -C "$WT" add -- "$DEST"
   git -C "$WT" diff --cached --quiet -- "$DEST" || git -C "$WT" commit -q \
-    -m "💄 [ui] $SLUG: before/after screenshots" \
+    -m "[ui] $SLUG: before/after screenshots" \
     -m "- round-0 and $FINAL shots, desktop + mobile, light + dark" -- "$DEST"
 fi
 SHA=$(git -C "$WT" rev-parse HEAD)

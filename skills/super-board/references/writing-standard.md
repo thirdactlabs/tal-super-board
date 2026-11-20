@@ -22,7 +22,7 @@ Every template in this pack points here. Change the format here first, then the 
 ## 1 · Commit
 
 ```
-<emoji> [<type>] <scope>: <subject>
+[<type>] <scope>: <subject>
 
 - <short bullet>
 - <short bullet>
@@ -32,38 +32,38 @@ Co-Authored-By: …
 
 | Field | Rule | Required |
 |---|---|---|
-| Subject | `<emoji> [<type>] <scope>: <subject>` · imperative · ≤ 72 chars | yes |
+| Subject | `[<type>] <scope>: <subject>` · imperative · ≤ 72 chars | yes |
 | Body | 1–4 short bullets: what changed, what proves it | yes, except trivial commits |
 | `Closes #N` | when the commit finishes a ticket | when it applies |
 | `--- decision ---` trailer | a rung-3 fork (super-build decision policy) | when it applies |
 
-| Emoji | Type | Use for |
-|---|---|---|
-| ✨ | `feat` | new behaviour |
-| 🐛 | `fix` | bug fix |
-| 🔧 | `chore` | tooling, config, loop markers |
-| ♻️ | `refactor` | same behaviour, better shape |
-| 🧪 | `test` | tests only |
-| ⚡ | `perf` | faster, same behaviour |
-| 📝 | `docs` | docs only |
-| 👷 | `ci` | CI pipelines |
-| 💄 | `ui` | visual polish, screenshots |
-| 🔒 | `security` | auth, secrets, hardening |
-| ⏪ | `revert` | revert a commit |
-| 🚧 | `wip` | partial work, checkpoints |
+| Type | Use for |
+|---|---|
+| `feat` | new behaviour |
+| `fix` | bug fix |
+| `chore` | tooling, config, loop markers |
+| `refactor` | same behaviour, better shape |
+| `test` | tests only |
+| `perf` | faster, same behaviour |
+| `docs` | docs only |
+| `ci` | CI pipelines |
+| `ui` | visual polish, screenshots |
+| `security` | auth, secrets, hardening |
+| `revert` | revert a commit |
+| `wip` | partial work, checkpoints |
 
 Subject regex (checked by `tests/test_writing_format.py`):
-`^(✨|🐛|🔧|♻️|🧪|⚡|📝|👷|💄|🔒|⏪|🚧) \[(feat|fix|chore|refactor|test|perf|docs|ci|ui|security|revert|wip)\] [a-z0-9][a-z0-9._/-]*: \S`
-The emoji must match its type.
+`^\[(feat|fix|chore|refactor|test|perf|docs|ci|ui|security|revert|wip)\] [a-z0-9][a-z0-9._/-]*: \S`
+No emoji anywhere: not in commit subjects, PR titles, bodies, comments or issue titles.
 
 Machine-read subjects (scripts grep these exact shapes):
 
 | Commit | Subject |
 |---|---|
-| Builder done | `🔧 [chore] loop: close #<N> — <summary>` |
-| Builder partial | `🚧 [wip] loop: #<N> partial — <slice or reason>` |
-| super-qa iteration done | `🧪 [test] super-qa: iter <N> (<X> bugs, <Y> items, <Z> PRs opened)` |
-| super-qa checkpoint | `🚧 [wip] super-qa: iter <N> — <one-liner>` |
+| Builder done | `[chore] loop: close #<N> — <summary>` |
+| Builder partial | `[wip] loop: #<N> partial — <slice or reason>` |
+| super-qa iteration done | `[test] super-qa: iter <N> (<X> bugs, <Y> items, <Z> PRs opened)` |
+| super-qa checkpoint | `[wip] super-qa: iter <N> — <one-liner>` |
 
 **Squash merge.** Subject = the PR title. Body = the PR's commit bullets, deduplicated, plus
 `Closes #N`. The merge gate takes them as `--subject` and `--body-file`.
@@ -71,7 +71,7 @@ Machine-read subjects (scripts grep these exact shapes):
 Example:
 
 ```
-🐛 [fix] receipts: show a size error over 10 MB
+[fix] receipts: show a size error over 10 MB
 
 - 413 now shows "File too large"
 - client checks size before upload
@@ -81,7 +81,7 @@ Closes #790
 
 ## 2 · PR
 
-**Title** = commit subject format: `🐛 [fix] receipts: show a size error over 10 MB`.
+**Title** = commit subject format: `[fix] receipts: show a size error over 10 MB`.
 
 **Body** = marker blocks, in this order. A lane rewrites only its own blocks, with
 `.claude/bin/super-board-pr-body.sh` (it refuses when the PR head moved since you read it).
@@ -104,23 +104,23 @@ Each block closes with `<!-- /sb:<name> -->`.
 
 ```
 > [!WARNING]
-> 🔴 Merged with a failing check: `e2e-mobile` · CI budget block; local suite green 42/42, truth 91/100
+> Merged with a failing check: `e2e-mobile` · CI budget block; local suite green 42/42, truth 91/100
 ```
 
 **Status card** — a GitHub alert, one line:
 
 | State | Alert | Line |
 |---|---|---|
-| building, in QA, in review | `> [!NOTE]` | `⏳ In review · round 1 · ✅ 2/3 AC · Closes #790 · head \`3f9c2a1\`` |
-| merged | `> [!TIP]` | `✅ Merged · \`9c41e07\`` |
-| blocked, red check | `> [!WARNING]` | `🛑 Blocked · needs Eric` |
+| building, in QA, in review | `> [!NOTE]` | `In review · round 1 · 2/3 AC · Closes #790 · head \`3f9c2a1\`` |
+| merged | `> [!TIP]` | `Merged · \`9c41e07\`` |
+| blocked, red check | `> [!WARNING]` | `Blocked · needs Eric` |
 
 A partial PR writes `Refs #N`, never `Closes #N`. A human-only step can ride inside the
 alert, one `> needs-you: <command>` line each; the merge gate reads it there or under Risk:
 
 ```
 > [!WARNING]
-> 🛑 Blocked · needs you · ✅ 2/3 AC · Closes #790 · head `3f9c2a1`
+> Blocked · needs you · 2/3 AC · Closes #790 · head `3f9c2a1`
 > needs-you: `npm run db:migrate:live`
 ```
 
@@ -173,10 +173,10 @@ fold, above the blank line and `</details>`; an older unfolded history still app
 
 | Lane | Done | Time | Details |
 |---|---|---|---|
-| 🔨 builder | ✅ | Oct 2, 10:02 EDT | draft · `3f9c2a1` |
-| 🔍 qa | ❌ v1 | Oct 2, 10:40 EDT | mobile hidden · `runs/issue-790-qa-v1/` |
-| 🔍 qa | ✅ v2 | Oct 2, 11:55 EDT | `runs/issue-790-qa-v2/` |
-| 🧐 reviewer | ✅ merged | Oct 2, 12:20 EDT | squash `9c41e07` |
+| builder | done | Oct 2, 10:02 EDT | draft · `3f9c2a1` |
+| qa | failed v1 | Oct 2, 10:40 EDT | mobile hidden · `runs/issue-790-qa-v1/` |
+| qa | passed v2 | Oct 2, 11:55 EDT | `runs/issue-790-qa-v2/` |
+| reviewer | merged | Oct 2, 12:20 EDT | squash `9c41e07` |
 
 </details>
 ```
@@ -197,30 +197,30 @@ here too.
 
 ```
 ## Risk
-🟢 **Low** · limit read from one constant; no plan differences.
+**Low** · limit read from one constant; no plan differences.
 - **Door:** two-way · revert the PR and the old check returns
 - **Blast radius:** upload form · users with files over 10 MB see a new error
 ```
 
-Levels: 🟢 Low · 🟡 Medium · 🔴 High. **Door** is two-way (a revert undoes it) or one-way
-(hard to undo: DROP, rename, data rewrite, public API, sent email); a one-way door is never 🟢.
+Levels: Low · Medium · High. **Door** is two-way (a revert undoes it) or one-way
+(hard to undo: DROP, rename, data rewrite, public API, sent email); a one-way door is never low.
 **Blast radius** is a short label (`none`, `page`, `billing`, `all users`) and one line on who
 breaks. A `needs-you: <command>` line (merge gate reads it) goes under Risk or inside the
 status alert.
 
 ## 3 · Ticket
 
-**Title:** `<emoji> [<kind>] <scope>: <what is wrong or wanted>` · ≤ 70 chars, no ticket number.
+**Title:** `[<kind>] <scope>: <what is wrong or wanted>` · ≤ 70 chars, no ticket number.
 
 | Kind | Title tag |
 |---|---|
-| bug | `🐛 [bug]` |
-| feature | `✨ [feat]` |
-| ux | `💄 [ui]` |
-| tests | `🧪 [test]` |
-| docs | `📝 [docs]` |
-| tech-debt, refactor | `♻️ [refactor]` |
-| security | `🔒 [security]` |
+| bug | `[bug]` |
+| feature | `[feat]` |
+| ux | `[ui]` |
+| tests | `[test]` |
+| docs | `[docs]` |
+| tech-debt, refactor | `[refactor]` |
+| security | `[security]` |
 
 **Sections**, in order:
 
@@ -231,7 +231,7 @@ status alert.
 | `## Evidence` | the folded 12-row table below | bugs |
 | `## Fix` | the intended change in 1–3 lines. No implementation plan | yes |
 | `## Acceptance Criteria` | 2–5 `- [ ]` items, each checkable by a test | yes |
-| `## Risk` | 🟢/🟡/🔴 level + one line | yes |
+| `## Risk` | low/medium/level + one line | yes |
 | `## Blocked by` | `- #N — why` bullets, or exactly `- None.` | yes |
 
 When an unsettled design triggers [design preflight](design-preflight.md), retain the
@@ -241,7 +241,7 @@ spec/ADR there. Keep the same sections. Lint saves only the exact issue edit the
 Example:
 
 ```
-🐛 [bug] receipts: spinner never stops over 10 MB
+[bug] receipts: spinner never stops over 10 MB
 
 ## Problem
 A 12 MB PDF spins forever. The 413 is never handled.
@@ -263,7 +263,7 @@ Map 413 to the size message; check size before upload.
 - [ ] No request over 10 MB leaves the browser
 
 ## Risk
-🟢 **Low** · limit lives in two places today; the fix makes it one constant.
+**Low** · limit lives in two places today; the fix makes it one constant.
 
 ## Blocked by
 - None.
@@ -332,10 +332,10 @@ how to use GitHub's file and line comments, and how to refresh notes without dup
 ### Lane status and findings
 
 ```
-[<role>] [<label>] <status-emoji> <status> · <round or short context>
+[<role>] [<label>] <status> · <round or short context>
 Did: <what this lane did, one line>
-✅ Done: <what passed or landed>
-❌ Not done: <what failed or was skipped, and why>   (omit when nothing)
+Done: <what passed or landed>
+Not done: <what failed or was skipped, and why>   (omit when nothing)
 Next: <owner>
 ```
 
@@ -343,7 +343,7 @@ Next: <owner>
 |---|---|
 | role (who writes it) | `builder` · `qa` · `reviewer` · `collect` · `orchestrator` |
 | label | `blocker` · `issue` · `suggestion` · `nit` · `question` · `praise` · `report` |
-| status emoji | ✅ pass/done · ❌ fail · ⏳ in progress · 🛑 blocked · 🙋 needs you · ↩️ moved back · ⚠️ warning |
+| status (a word) | passed · failed · in progress · blocked · needs you · moved back · warning |
 | Next | `builder` · `qa` · `reviewer` · `Eric` · `none` |
 
 Header regex: `^\[(builder|qa|reviewer|collect|orchestrator)\] \[(blocker|issue|suggestion|nit|question|praise|report)\] \S`
@@ -357,10 +357,10 @@ Header regex: `^\[(builder|qa|reviewer|collect|orchestrator)\] \[(blocker|issue|
 Example:
 
 ```
-[qa] [report] ❌ failing · round 1
+[qa] [report] failing · round 1
 Did: ran AC1–AC2, desktop + mobile
-✅ Done: AC2 no request over 10 MB
-❌ Not done: AC1 mobile: message under the keyboard
+Done: AC2 no request over 10 MB
+Not done: AC1 mobile: message under the keyboard
 Next: builder
 Local tests: npx playwright test e2e/upload-size.spec.ts
 ```
@@ -375,16 +375,16 @@ R-ids never change; a new finding takes the next free id.
 
 ```
 <!-- super-review:report -->
-[reviewer] [report] ❌ bounced · round 2
+[reviewer] [report] bounced · round 2
 Did: re-checked R1–R2, fresh pass skipped (R2 open)
-✅ Done: R1 fixed `src/cart.py:12`
-❌ Not done: R2 not fixed `src/cart.py:31`
+Done: R1 fixed `src/cart.py:12`
+Not done: R2 not fixed `src/cart.py:31`
 Next: builder
 
 | ID | Owner | Class | Where | Finding | Status |
 |---|---|---|---|---|---|
-| R1 | builder | Bug | `src/cart.py:12` | average_price divides by zero on an empty cart | ✅ fixed |
-| R2 | builder | Bug | `src/cart.py:31` | discount_pct not clamped to 0–100 | ❌ not fixed |
+| R1 | builder | Bug | `src/cart.py:12` | average_price divides by zero on an empty cart | fixed |
+| R2 | builder | Bug | `src/cart.py:31` | discount_pct not clamped to 0–100 | not fixed |
 ```
 
 Reviewer status words: `merge-ready` · `bounced` · `blocked` · `human-gated` · `unverified` ·
@@ -406,7 +406,7 @@ Tables plus CAPS rules (NEVER / DON'T / ALWAYS). No prose paragraphs. The manage
 
 ## Human approval evidence
 
-A 🙋 merge hold has one canonical request comment on the linked issue (or on the PR
+A merge hold has one canonical request comment on the linked issue (or on the PR
 when it has no linked issue). Copy the gate's `approval-request:` line verbatim into
 that comment; it pins the repository, PR, full head and policy/human-step scope.
 Other threads link to that request without repeating its machine lines. A trusted
