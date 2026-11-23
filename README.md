@@ -44,8 +44,8 @@ curl -fsSL https://raw.githubusercontent.com/EricTechPro/super-board/main/get.sh
 Or as a Claude Code plugin:
 
 ```
-/plugin marketplace add EricTechPro/super-board
-/plugin install super-board@super-board
+/plugin marketplace add thirdactlabs/tal-super-board
+/plugin install super-board@tal-super-board
 ```
 
 > [!NOTE]
@@ -121,9 +121,9 @@ Add cards to `Ready`. The board drains on its own.
 
 | Skill | What it does |
 |---|---|
-| [`/super-build`](skills/super-build/README.md) | Builder lane: worktree, smallest safe change, tests, draft PR. |
-| [`/super-qa`](skills/super-qa/README.md) | Tester lane: evidence, test-gap check, screenshots, or bounce to Build. |
-| [`/super-review`](skills/super-review/README.md) | Reviewer lane: own hypotheses, remembers prior findings, merge gate. |
+| [`/super-build`](skills/super-build/README.md) | Builder lane: worktree, smallest safe change, tests, branch (draft PR in gate mode). |
+| [`/super-qa`](skills/super-qa/README.md) | Tester lane: evidence, test-gap check, screenshots, repairs new failures itself. |
+| [`/super-review`](skills/super-review/README.md) | Reviewer lane: merge gate, or Codex-bot mode: raise PR ready, confirm merge. |
 | [`/super-pr-loop`](skills/super-pr-loop/README.md) | Codex-bot loop: verify, fix, defer, resolve each thread; the project's workflow merges. |
 | [`/pr-security-review`](skills/pr-security-review/README.md) | Security pass on every PR diff; super-qa runs it, findings fail QA. |
 <!-- skills:end -->

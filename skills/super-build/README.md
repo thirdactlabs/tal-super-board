@@ -1,6 +1,6 @@
 # /super-build
 
-The Builder: turns a `Ready` card into a branch, the smallest safe change, tests and a draft PR.
+The Builder: turns a `Ready` card into a branch, the smallest safe change, tests and a pushed branch (a draft PR in gate mode; in Codex-bot mode the Reviewer raises the PR ready).
 
 ## What It Does
 
