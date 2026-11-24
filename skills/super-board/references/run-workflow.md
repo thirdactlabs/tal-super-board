@@ -178,7 +178,7 @@ Repeat until a done condition or halt gate fires:
    backstop — the guard exists so a wave does not start that the limit would
    cut off mid-lane. The legacy `claude-p` dispatcher does not run this guard.
 2. **Plan the wave** —
-   `bash .claude/bin/super-board-wave-plan.sh --config <config-path>` →
+   `bash .claude/bin/super-board-wave-plan.sh --config <config-path>` (add `--check-awaiting` on wave 1 only, so cards parked on a human merge are checked once per run) →
    Exit 9 is a verification-readiness halt: preserve work and claims, repair the
    owning project's `verify_commands`, then restart explicitly. No GitHub recovery probe,
    rebase, Build bounce, or automatic retry.
@@ -235,7 +235,7 @@ Repeat until a done condition or halt gate fires:
    first (Review → QA → Ready), cut to `max_workers` when it is set (0 or
    absent = no cap). `max_workers` is the GitHub-limit valve: step 5 lowers it
    after a wave that hit the hourly limit. If `cards` is empty and
-   Building/QA/Review counts are 0 → done. If empty but cards sit in Blocked
+   Building/QA/Review counts are 0 → done (cards in `awaiting` do not count; report them as "N PRs waiting for a human merge"). If empty but cards sit in Blocked
    only → report and stop. This is unfinished work, not a completed-run calibration trigger.
 3. **Claim** — for each card, `gh issue edit <n> --add-assignee <bot_identity>`,
    then VERIFY: re-read assignees (`gh issue view <n> --json assignees`) and

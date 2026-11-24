@@ -1,6 +1,6 @@
 ---
 name: super-pr-loop
-description: Drive one PR's Codex-bot review threads to closure for the super-board Review lane, or standalone. Polls for the Codex bot's review and any unresolved thread, verifies each finding against the real code, fixes what is small, defers what needs design into a GitHub Backlog ticket, replies to and resolves every thread, then pushes once per pass (a push re-triggers Codex). At most 3 fix passes. Never merges: the project's own merge-after-codex-review workflow does that once Codex is clean. Use when the user says "/super-pr-loop", "super-pr-loop", "fix the Codex review", "resolve Codex comments on this PR", or when the Review lane runs in pr_review "codex-bot" mode.
+description: Drive one PR's Codex-bot review threads to closure for the super-board Review lane, or standalone. Polls for the Codex bot's review and any unresolved thread, verifies each finding against the real code, fixes what is small, defers what needs design into a GitHub Backlog ticket, replies to and resolves every thread, then pushes once per pass (a push re-triggers Codex). At most 3 fix passes. Never merges: the repo's own workflow, or a human, does that. A repo with no Codex review is not an error. Use when the user says "/super-pr-loop", "super-pr-loop", "fix the Codex review", "resolve Codex comments on this PR", or when the Review lane runs in pr_review "codex-bot" mode.
 argument-hint: "<PR number> [--ignore \"keyword\"] [--wont-fix \"keyword\"]"
 ---
 
@@ -16,9 +16,11 @@ One PR per run. Several PRs → refuse and name the one to start with.
 
 1. `gh pr view <PR> --json state,isDraft,headRefName,baseRefName`. Not `OPEN` → stop. Draft →
    `gh pr ready <PR>` (a draft is never reviewed or merged).
-2. The Codex trigger exists: `git ls-files .github/workflows | xargs grep -l '@codex review'`.
-   None → stop with "run `.claude/bin/super-board-codex-bot-install.sh --config <cfg>` first".
-    **Never post `@codex review` yourself**; the workflow does it on every push.
+2. Does the repo post a Codex trigger? `git grep -l '@codex review' origin/<base> -- .github/workflows`.
+   It only sets how long step 1 waits for a first review (12 minutes with a trigger, 3 without,
+   since the Codex app can also review on its own). Nothing to install: a repo with no Codex
+   review is a normal result (`no-codex` below), not an error.
+   **Never post `@codex review` yourself**; the repo's workflow does it on every push.
 3. Pick the config in `.claude/super-board/configs/`. Its `verify_commands` are the suites to
    run before every push.
 4. **Never merge, never push to the base branch.** Fix commits go to the PR's own branch.
@@ -44,7 +46,9 @@ gh api --paginate repos/<owner>/<repo>/pulls/<PR>/comments --jq '[.[] | .id] | s
     `headRefOid`. This is the comment `merge-after-codex-review.yml` reacts to. Clean means this
     comment on the current head AND no unresolved thread on the worklist above.
   A findings review also quotes `**Reviewed commit:**`; only a `comments[]` entry counts as clean.
-  Neither form on the head yet is **not clean**: wait.
+  Neither form on the head yet is **not clean**: wait, up to the window from Preconditions 2
+  for the first review (after a push, up to 12 minutes). Past the window with no Codex review at
+  all on this PR, stop `no-codex`.
 - **Wait with a background `sleep 300`, repeated.** Never `ScheduleWakeup` or `/loop`: they
   end a lane's turn and the orchestrator reads that as a failure. Stay in this agent.
 - Always `--paginate`. Diff comment ids against the last pass, never counts.
@@ -95,10 +99,10 @@ Run every `verify_commands` entry. A **new** failure (run.md → "Pre-existing f
 | Clean: the bot's clean comment is on the current head and no thread is unresolved; PR still `OPEN` | report clean; the project's merge workflow takes over |
 | 3 fix passes pushed and Codex still raises real findings | `round-cap` |
 | A finding needs a human decision | `needs-decision` |
-| Neither a review nor a clean comment on the head after 12 minutes | `no-codex-review` (is the app on the repo, is `CODEX_REVIEW_TOKEN` set?) |
+| No Codex review or clean comment on the head within the wait, and no human thread to work | `no-codex`: the repo has no Codex review. Report it and stop; nothing is wrong |
 | A suite fails newly after a fix (not red on the base) | `tests`, nothing pushed |
 
-The lane turns a non-clean stop into a Blocked card using the block template. Standalone, print
+The lane turns `round-cap`, `needs-decision` and `tests` into a Blocked card (or a QA bounce) using the block template; `no-codex` and clean both continue. Standalone, print
 the reason and stop.
 
 ## Rules

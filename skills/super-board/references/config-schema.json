@@ -124,8 +124,9 @@
   "human_approves_merge": false,
 
   // Who reviews and merges (opt-in). "gate" (default): the Reviewer reviews and merges through
-  // super-board-merge-gate.sh. "codex-bot": the Codex GitHub review bot reviews, /super-pr-loop
-  // drives its threads, and the project's own merge-after-codex-review workflow merges (references/codex-bot-review.md).
+  // super-board-merge-gate.sh. "codex-bot": the Reviewer raises the PR ready after QA and review; if the repo has a
+  // Codex review, /super-pr-loop fixes its findings; the repo's own auto-merge, or a human, merges
+  // (references/codex-bot-review.md). Nothing is installed and neither Codex nor auto-merge is required.
   "pr_review": "gate",
 
   // Who merges what (v2.6.0). Evaluated by super-board-merge-gate.sh (via

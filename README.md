@@ -124,7 +124,7 @@ Add cards to `Ready`. The board drains on its own.
 | [`/super-build`](skills/super-build/README.md) | Builder lane: worktree, smallest safe change, tests, branch (draft PR in gate mode). |
 | [`/super-qa`](skills/super-qa/README.md) | Tester lane: evidence, test-gap check, screenshots, repairs new failures itself. |
 | [`/super-review`](skills/super-review/README.md) | Reviewer lane: merge gate, or Codex-bot mode: raise PR ready, confirm merge. |
-| [`/super-pr-loop`](skills/super-pr-loop/README.md) | Codex-bot loop: verify, fix, defer, resolve each thread; the project's workflow merges. |
+| [`/super-pr-loop`](skills/super-pr-loop/README.md) | Codex-bot loop: verify, fix, defer, resolve each thread; the repo or a human merges. |
 | [`/pr-security-review`](skills/pr-security-review/README.md) | Security pass on every PR diff; super-qa runs it, findings fail QA. |
 <!-- skills:end -->
 

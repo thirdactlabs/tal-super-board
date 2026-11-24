@@ -1,51 +1,39 @@
 # Codex-bot review (Reviewer lane, `pr_review: "codex-bot"`)
 
 Opt-in. Config key `"pr_review": "gate"` (default) keeps the Reviewer's own review and the
-merge gate. `"codex-bot"` makes the Codex GitHub review bot the reviewer and a repo workflow
-the merger. Same shape as shipmaxxing: **the lane reviews before the PR is raised, drives the
-bot's findings to closure, never merges, and confirms the merge landed.**
+merge gate. `"codex-bot"` is the shipmaxxing shape: **the lane reviews before the PR is raised,
+raises it ready, fixes whatever the repo's Codex review finds, and leaves the merge to the repo.**
+
+Super-board installs nothing and never assumes the repo has Codex or an auto-merge. It detects
+both at run time and works either way:
+
+| The repo has | The lane does |
+|---|---|
+| A Codex review (the bot comments on the PR) | Drives its findings to closure with `/super-pr-loop` (max 3 fix passes). |
+| No Codex review | Nothing to fix. The PR is raised and the lane moves on. Not a block. |
+| An auto-merge (a merge workflow, or GitHub auto-merge on the PR) | Confirms the merge landed, then closes the card. |
+| No auto-merge | Leaves the PR ready and open for a human to merge. Not a block. |
 
 "Codex" here is the GitHub review bot. It is unrelated to the Codex CLI host
 (`super-board-codex-lane.sh`, config `host`).
 
-## One-time setup (per repo)
+Why there is no draft PR: a repo's merge workflow may merge any non-draft PR once Codex is clean,
+and its trigger may review on every open and push. A PR opened at build time would spend review
+rounds on unfinished work and could merge before QA and review finish. So the PR does not exist
+until the Reviewer raises it.
 
-1. The project already has the Codex pieces its other repos use: the Codex GitHub app, the
-   `CODEX_REVIEW_TOKEN` secret, a trigger workflow that posts `@codex review`, and a
-   `merge-after-codex-review` workflow that squash-merges after Codex's clean comment. Super-board
-   ships **no merger of its own**: that workflow is the only thing that merges, and the merge
-   gate and `merge_policy` do not run in this mode.
-2. The project's own trigger works as it is: this mode raises the PR already marked ready and never
-   as a draft (see "Before the PR"), so it fires exactly when the PR is created and on every push
-   after. Only a project with no trigger needs one:
-   `.claude/bin/super-board-codex-bot-install.sh --config .claude/super-board/configs/<slug>.json`
-   writes `codex-review-trigger.yml` with the base branch filled in.
-3. A trigger the installer wrote must be on the board's base branch (`pull_request_target` runs from the PR's base).
-4. Set `"pr_review": "codex-bot"` in the config.
-
-## The project's workflows
-
-| Workflow | Needed behaviour |
-|---|---|
-| Trigger | Posts `@codex review` when a PR opens and on every push after that. |
-| Merge | Merges after the bot's clean comment (`**Reviewed commit:**`) for the current head. Super-board does not touch it. |
-
-Why there is no draft PR: the merge workflow merges any non-draft PR once Codex is clean, and the
-trigger reviews on every open and push. A PR opened at build time would spend Codex rounds on
-unfinished work and could merge before QA and review finish. So the PR does not exist until the
-Reviewer raises it.
-
-Tradeoff of using the project's merge workflow as it is: money, auth, schema and large PRs
-auto-merge too, because that workflow has no policy check.
+Tradeoff when the repo auto-merges: money, auth, schema and large PRs merge too, because the
+repo's workflow has no policy check. The merge gate and `merge_policy` do not run in this mode.
 
 ## Reviewer lifecycle in this mode
 
 Replaces run.md → Reviewer steps 3, 3b, 4, 6 and 7 and the merge protocol. Steps 1 (worktree) and
 5 (test rerun) are unchanged; step 2 (Gate 1) reads the issue report, see "Before the PR".
 
-1. **Installed?** `git ls-tree origin/<base> .github/workflows/` shows no workflow containing
-   `@codex review` → Blocked `codex-bot not installed`, with the install command from setup step 2.
-2. **Review before the PR is raised.** One pass, no loop:
+0. **Resume check, first.** `gh pr list --head issue-<N>-<slug> --state all --json number,state`.
+   A PR already exists (an earlier pass raised it) → skip to "Resuming" below; do not review,
+   sync or raise again.
+1. **Review before the PR is raised.** One pass, no loop:
    - `FP=$(git merge-base HEAD origin/<base>)`. Spec file: the issue title, body and ACs.
    - Invoke `mattpocock-skills:code-review` with `FP` and the spec file.
    - Standards findings: fix the documented violations. Spec findings: remove scope creep, fix a
@@ -53,33 +41,50 @@ Replaces run.md → Reviewer steps 3, 3b, 4, 6 and 7 and the merge protocol. Ste
      (human gate, block template).
    - Commit each fix by file name, then rerun `verify_commands`. A new failure → a `[qa]` finding line
      in the issue report and card to QA, as in Reviewer step 5.
-3. **Sync with the base.** `git fetch origin && git merge origin/<base>` (never a force push).
+2. **Sync with the base.** `git fetch origin && git merge origin/<base>` (never a force push).
    A conflict that is not mechanical → `loop:rebase`, per run.md → "The rebase pass".
    The merge changed any file → rerun `verify_commands` once before the push; a new failure is handled
-   as in step 2 (pre-existing ones: run.md → "Pre-existing failures").
-4. **Raise the PR, ready, never a draft.** `git push`, then `gh pr create --base <base> --head
+   as in step 1 (pre-existing ones: run.md → "Pre-existing failures").
+3. **Raise the PR, ready, never a draft.** `git push`, then `gh pr create --base <base> --head
    issue-<N>-<slug>`: title in the commit-subject format, body = run.md → "PR description template"
    with every block filled once from the issue reports (see "Before the PR"). Post the
-   [PR author notes](pr-author-notes.md). The project's trigger fires on the open.
-5. **Codex loop.** Before using the helper, `super-board-skills-ready.py --require super-pr-loop`. Run `/super-pr-loop <PR>` inline, in this agent. Never `ScheduleWakeup` or
-   `/loop`. Its stops map to the board:
+   [PR author notes](pr-author-notes.md). If the repo has a Codex trigger it fires on the open.
+4. **Codex loop, only if the repo has a Codex review.** Run `/super-pr-loop <PR>` inline, in this
+   agent (`super-board-skills-ready.py --require super-pr-loop` first). Never `ScheduleWakeup` or
+   `/loop`. It waits for a Codex review, fixes what it raises, and stops on one of:
 
    | `super-pr-loop` result | Card |
    |---|---|
-   | clean (the bot's `**Reviewed commit:**` comment on the head, no open thread), or `MERGED` | continue to step 6 |
+   | clean (the bot's `**Reviewed commit:**` comment on the head, no open thread), or `MERGED` | continue to step 5 |
+   | `no-codex` (no Codex review appeared: the repo has none) | continue to step 5. Say so in the report. Not a block. |
    | `round-cap` (3 fix passes) | Blocked, block template |
    | `needs-decision` | Blocked, the question, options and recommendation |
-   | `no-codex-review` (neither a review nor a clean comment on the head) | Blocked: is the app installed, is the secret set? |
    | `tests` | `[qa]` thread, card to QA |
 
-6. **Confirm the merge.** Never `gh pr merge`, never the merge gate. Poll about every 60 s for up
-   to 15 minutes: `gh pr view <PR> --json state,mergeCommit,mergeStateStatus`. On `MERGED`:
-   `git fetch origin <base> && git merge-base --is-ancestor <sha> origin/<base>` must pass.
-   - Still `OPEN` at 15 minutes: Blocked `not merged`. Quote `mergeStateStatus`, any failing
-     check, and whether the bot's clean comment is on the head. The human merges or fixes it.
-7. **Close out** as run.md → Merge protocol step 4: close the issue, card Review → Done, rewrite
-   `status` and `history`, post `[reviewer] [report] merged` citing the merge commit. The card
-   **never** reaches Done before step 6 passes.
+5. **Merge, if the repo merges by itself.** Never `gh pr merge`, never the merge gate. Auto-merge
+   exists when `gh pr view <PR> --json autoMergeRequest` is set, or `origin/<base>` has a
+   workflow that merges PRs (`git grep -lE 'gh pr merge|enablePullRequestAutoMerge|auto-merge'
+   origin/<base> -- .github/workflows`).
+   - **Auto-merge exists:** poll about every 60 s for up to 15 minutes:
+     `gh pr view <PR> --json state,mergeCommit,mergeStateStatus`. On `MERGED`,
+     `git fetch origin <base> && git merge-base --is-ancestor <sha> origin/<base>` must pass.
+     Still `OPEN` at 15 minutes: handle it as "no auto-merge" below, and quote `mergeStateStatus`
+     and any failing check in the report.
+   - **No auto-merge, or not merged in time:** the PR stays ready and open for a human to merge.
+     Edit the `[reviewer] [report]` to `in progress · PR #<N> is ready, waiting for a human
+     merge`. Label the issue `awaiting-merge` (`gh label create awaiting-merge --force` first; the
+     planner leaves such cards out of a wave). The card stays in Review. It is not Blocked and not
+     Done. Stop here.
+6. **Close out** on `MERGED` (by the workflow or by a human) as run.md → Merge protocol step 4:
+   close the issue, remove the `awaiting-merge` label, card Review → Done, rewrite `status` and `history`, post `[reviewer]
+   [report] merged` citing the merge commit. The card **never** reaches Done before the merge
+   is confirmed.
+
+**Resuming.** A Review card whose PR is already raised is not reviewed again. Check `state`:
+`MERGED` → step 6; `OPEN` with the Codex loop not yet finished (no `[reviewer] [report]` saying
+`waiting for a human merge`) → continue at step 4; `OPEN` and waiting → leave it and move on;
+`CLOSED` unmerged → Blocked `PR closed`, the human decides. Cards that depend on it
+(`## Blocked by`) wait until it is Done.
 
 The Reviewer report (writing-standard.md § 4) is still one comment per PR, edited in place. Its
 `Did:` line names the code-review pass and the Codex rounds; findings Codex raised are rows
@@ -87,8 +92,7 @@ owned by `builder` with the Status the loop reached.
 
 ## Before the PR (no PR until Review)
 
-This applies while no PR exists. A card that comes back with a PR already open (a `tests` or
-`not merged` return) uses the PR threads and blocks exactly as run.md says.
+This applies while no PR exists. A card that comes back with a PR already open (a `tests` return or a resume) uses the PR threads and blocks exactly as run.md says.
 
 Builder and Tester work on the pushed branch `issue-<N>-<slug>`; their state lives in issue
 comments. Where run.md says PR comment, post an issue comment; where it says PR thread, write a
@@ -108,7 +112,7 @@ lane's issue report. The Reviewer copies it into the PR body once, when it raise
 | Reviewer Gate 1: scan PR threads | The latest lane report on the issue has no open finding line. No PR thread exists yet. |
 | Reviewer report, edited in place on the PR | The same marker comment, edited in place, on the issue. |
 
-Raising the PR (lifecycle step 4) writes the body from those reports: `status` for Review,
+Raising the PR (lifecycle step 3) writes the body from those reports: `status` for Review,
 `problem` and `solution` from the Builder report, `ac` ticked from QA's proof lines, `visual` from
 QA's screenshots, one `history` row per lane report, `risk` from the Builder. From then on each
 lane rewrites only its own block with `super-board-pr-body.sh`, as run.md says.
@@ -120,4 +124,5 @@ files the new card names.
 ## Not in this mode
 
 The independent hypothesis pass, the adversarial truth-check and `truth_threshold`, and the
-merge gate and `merge_policy`. Codex is the second reviewer and the project's workflow merges.
+merge gate and `merge_policy`. The repo's Codex review, when it has one, is the second reviewer,
+and the repo's own workflow, or a human, merges.

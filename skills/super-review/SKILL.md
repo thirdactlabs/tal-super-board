@@ -46,7 +46,7 @@ If the input is ambiguous, default to reviewing the current branch against its u
 
 ## Codex-bot mode
 
-When the config says `"pr_review": "codex-bot"`, the Codex GitHub bot is the second reviewer and the project's own workflow merges. Follow [codex-bot-review.md](../super-board/references/codex-bot-review.md) instead of the independent pass, the truth-check and the merge gate, raise the PR ready (never a draft) after your own review, and drive the bot's threads with `/super-pr-loop`. Otherwise ignore this section.
+When the config says `"pr_review": "codex-bot"`, the repo's Codex review (if it has one) is the second reviewer and the repo's own auto-merge (if it has one), or a human, merges; neither is required. Follow [codex-bot-review.md](../super-board/references/codex-bot-review.md) instead of the independent pass, the truth-check and the merge gate, raise the PR ready (never a draft) after your own review, fix the bot's findings with `/super-pr-loop` when there are any, and leave the PR open for a human when the repo does not merge by itself. Otherwise ignore this section.
 
 ## Review flow
 
