@@ -36,7 +36,9 @@ REGISTRY = {
     'optional': {'build': [], 'qa': ['security-audit'], 'review': ['ponytail:ponytail-review']},
     'aliases': {'mattpocock-skills': ['diagnosing-bugs', 'tdd', 'implement', 'codebase-design', 'code-review',
                                    'resolving-merge-conflicts', 'domain-modeling', 'ask-matt', 'to-spec', 'to-tickets', 'implement-spec', 'improve-codebase-architecture'],
-                'ponytail': ['ponytail', 'ponytail-review']},
+                'ponytail': ['ponytail', 'ponytail-review'],
+                'superpowers': ['verification-before-completion'],
+                'engineering': ['testing-strategy']},
     'fallbacks': {'ponytail:ponytail': {'id': 'simplest-solution-first', 'source': POLICY + '#simplest-solution-first'},
                   'ponytail:ponytail-review': {'id': 'over-engineering-ladder', 'source': 'skills/super-review/SKILL.md#over-engineering'}},
 }
