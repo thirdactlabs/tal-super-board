@@ -193,6 +193,22 @@ class Readiness(unittest.TestCase):
         entry.update(projectPath=str(self.root)); manifest.write_text(json.dumps(dict(plugins={'mattpocock-skills@official':[entry]})))
         self.run_cli()
 
+    def test_namespaced_plugin_installs_satisfy_bare_helper_names(self):
+        self.full()
+        plugins = {}
+        for name, plugin in [('verification-before-completion', 'superpowers'), ('testing-strategy', 'engineering')]:
+            (self.root / '.claude/skills' / name / 'SKILL.md').unlink()
+            self.run_cli(expected=10)
+            path = self.home / 'plugins' / plugin / 'skills' / name / 'SKILL.md'
+            path.parent.mkdir(parents=True); path.write_text('plugin copy')
+            plugins[plugin + '@official'] = [dict(scope='user', installPath=str(self.home / 'plugins' / plugin))]
+        (self.home / '.claude/plugins').mkdir(parents=True, exist_ok=True)
+        (self.home / '.claude/settings.json').write_text(json.dumps(dict(enabledPlugins={key: True for key in plugins})))
+        (self.home / '.claude/plugins/installed_plugins.json').write_text(json.dumps(dict(version=2, plugins=plugins)))
+        names = {e['name']: e['status'] for e in self.run_cli()['entries']}
+        self.assertEqual(names['superpowers:verification-before-completion'], 'resolved')
+        self.assertEqual(names['engineering:testing-strategy'], 'resolved')
+
     def test_project_plugin_precedes_user_install_and_flattened_user_root(self):
         self.full()
         (self.root / '.claude/skills/code-review/SKILL.md').unlink()
@@ -232,7 +248,7 @@ class Readiness(unittest.TestCase):
             self.card['labels'] = labels
             result = self.run_cli(extra=['--lane','build'])
             names = [e['name'] for e in result['entries'] if e['requirement']=='required']
-            self.assertEqual(names, ['super-board','super-build', *expected, 'ponytail:ponytail','verification-before-completion','mattpocock-skills:code-review'])
+            self.assertEqual(names, ['super-board','super-build', *expected, 'ponytail:ponytail','superpowers:verification-before-completion','mattpocock-skills:code-review'])
         # A docs chain can be ready while a proposed feature chain is incomplete.
         (self.root / '.claude/skills/implement/SKILL.md').unlink()
         self.card['labels'] = ['docs']; self.run_cli()

@@ -57,6 +57,7 @@ import re
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 COLUMNS = ["Backlog", "Ready", "Building", "QA", "Review", "Blocked", "Done"]
 HOSTS = ("claude", "codex", "opencode")  # config `host`; super-board-host.sh accepts the same
@@ -401,7 +402,8 @@ def fix(root, pack, helpers=True, dry=False, host="claude", home=None, catalog=N
         if not pack:
             return {**before, "fixed": [], "error": "pack-not-found"}
         if not dry:
-            r = run(["bash", os.path.join(pack, "install.sh"), root],
+            # bash eats backslashes in C:\... paths; forward slashes work on every OS
+            r = run(["bash", (Path(pack) / "install.sh").as_posix(), Path(root).as_posix()],
                     input="", cwd=root)
             if r.returncode != 0:
                 return {**before, "fixed": fixed, "error": "install.sh failed: " + (r.stderr or r.stdout)[-300:]}
