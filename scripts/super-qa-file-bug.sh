@@ -182,10 +182,10 @@ ${BODY_RAW}" >/dev/null 2>&1 || { python3 "$GITHUB_READ" --halt "Comment outcome
 fi
 
 # --- compose ----------------------------------------------------------------
-# Title: `<emoji> [<kind>] <scope>: <title>` (writing-standard.md § 3).
+# Title: `[<kind>] <scope>: <title>` (writing-standard.md § 3).
 case "$KIND" in
-  bug) BADGE="🐛 [bug]" ;; ux) BADGE="💄 [ui]" ;; feature) BADGE="✨ [feat]" ;;
-  tests) BADGE="🧪 [test]" ;; docs) BADGE="📝 [docs]" ;; tech-debt) BADGE="♻️ [refactor]" ;;
+  bug) BADGE="[bug]" ;; ux) BADGE="[ui]" ;; feature) BADGE="[feat]" ;;
+  tests) BADGE="[test]" ;; docs) BADGE="[docs]" ;; tech-debt) BADGE="[refactor]" ;;
 esac
 SCOPE="${AREA:-$(echo "${ROUTE:-}" | sed -E 's#^/+##; s#/+$##; s#[^A-Za-z0-9._-]+#-#g' | tr '[:upper:]' '[:lower:]')}"
 SCOPE="${SCOPE:-app}"

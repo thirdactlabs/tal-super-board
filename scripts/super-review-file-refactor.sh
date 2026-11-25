@@ -140,7 +140,7 @@ trap 'rm -f "$BODY_TMP"' EXIT
     echo
     echo "## Risk"
     echo
-    echo "🟡 **Medium** · not assessed by the Reviewer that filed this; lint sets it."
+    echo "**Medium** · not assessed by the Reviewer that filed this; lint sets it."
   fi
   if ! grep -qiE '^## +Blocked by *$' "$BODY_FILE"; then
     echo
@@ -180,16 +180,16 @@ done
 LABEL_ARGS=()
 for l in "${LABELS[@]}"; do LABEL_ARGS+=(--label "$l"); done
 
-# Title: `♻️ [refactor] <scope>: <title>`; scope = --area, else the fingerprint's module.
+# Title: `[refactor] <scope>: <title>`; scope = --area, else the fingerprint's module.
 # --title is the bare problem. A caller that followed the house format passes
-# `<emoji> [<kind>] <scope>: <subject>`; drop that prefix so it is not doubled. Only a
-# leading all-non-ASCII word (the emoji) triggers it, so `Map [x] fields: keep order` stays.
-TITLE=$(printf '%s' "$TITLE" | LC_ALL=C sed -E 's/^[^ -~]{1,16} \[[a-z-]+\] [^:]{1,40}: //')
+# `[<kind>] <scope>: <subject>` (an older caller may add a leading emoji); drop that prefix so it is
+# not doubled. A title that merely contains `[x]` later, like `Map [x] fields: keep order`, stays.
+TITLE=$(printf '%s' "$TITLE" | LC_ALL=C sed -E 's/^([^ -~]{1,16} )?\[[a-z-]+\] [^:]{1,40}: //')
 SCOPE="${AREA:-${FINGERPRINT%%|*}}"
 SCOPE=$(echo "${SCOPE:-code}" | tr '[:upper:]' '[:lower:]' | sed -E 's#[^a-z0-9._/-]+#-#g; s#^-+|-+$##g')
 python3 "$GITHUB_READ" --check || exit $?
 ISSUE_URL=$(gh issue create "${REPO_FLAG[@]}" \
-  --title "♻️ [refactor] ${SCOPE:-code}: ${TITLE}" \
+  --title "[refactor] ${SCOPE:-code}: ${TITLE}" \
   --body-file "$BODY_TMP" \
   "${LABEL_ARGS[@]}") || { python3 "$GITHUB_READ" --halt "Issue creation response failed; reconcile fingerprint ${FINGERPRINT} before retrying"; exit 79; }
 

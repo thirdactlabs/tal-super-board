@@ -157,7 +157,7 @@ OUT=$(run "${BASE[@]}" --kind bug --priority high --category functional \
   --area imports --route /imports --spec e2e/paths/imports.spec.ts --iter 3 \
   --fingerprint "imports|tc-1|silent-drop" --suggested-skill super-build)
 is  "returns the issue number"   "77" "$OUT"
-has "board-readable title"       "$(cat "$GH_LOG")" "🐛 [bug] imports: CSV upload silently drops rows"
+has "board-readable title"       "$(cat "$GH_LOG")" "[bug] imports: CSV upload silently drops rows"
 has "labels the source"          "$(cat "$GH_LOG")" "source:qa"
 has "labels the priority"        "$(cat "$GH_LOG")" "priority:high"
 has "labels the qa category"     "$(cat "$GH_LOG")" "qa:functional"

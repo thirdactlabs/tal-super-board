@@ -78,7 +78,7 @@ The Worker self-check item "Card column move re-read and verified" previously re
 
 When `truth_gate` triggers adversarial mode, each sub-agent (Code-grounder, Historian) MUST stay within `SB_GH_GUARD_SUBAGENT_BUDGET` (default 50) gh calls. The Reviewer passes this budget to each sub-agent via prompt:
 
-> Adversarial sub-agent budget: ≤50 gh calls total. Prefer `git blame` (local) over `gh api graphql` (remote). If you need more than 50 calls to reach a confidence score, return `confidence: "insufficient_data"` and let the Reviewer flag the card as 🛡 truth-check inconclusive — do NOT burn through quota.
+> Adversarial sub-agent budget: ≤50 gh calls total. Prefer `git blame` (local) over `gh api graphql` (remote). If you need more than 50 calls to reach a confidence score, return `confidence: "insufficient_data"` and let the Reviewer flag the card as truth-check inconclusive — do NOT burn through quota.
 
 ## 5. Backoff on 403 / secondary rate limit
 

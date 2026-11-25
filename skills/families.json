@@ -1,20 +1,22 @@
 {
   "you_type": {
-    "title": "You type — 5 skills",
+    "title": "You type — 6 skills",
     "skills": {
       "super-board": "Orchestrator: plans waves, runs Build → QA → Review, merges when green.",
       "super-collect": "Finds problems, verifies them, writes a findings doc for /to-spec and /to-tickets.",
+      "super-ticket": "Grills you on a feature, writes board-ready tickets, files them into Backlog.",
       "ui-refine-loop": "Critique → refine loop that polishes one page or component.",
       "visual": "One HTML page: branch recap, plan, or codebase map with diagrams.",
       "git-sync": "Commit per logical change, merge-pull, push without force, report."
     }
   },
   "board_runs": {
-    "title": "The board runs — 4 skills",
+    "title": "The board runs — 5 skills",
     "skills": {
-      "super-build": "Builder lane: worktree, smallest safe change, tests, draft PR.",
-      "super-qa": "Tester lane: evidence, test-gap check, screenshots, or bounce to Build.",
-      "super-review": "Reviewer lane: own hypotheses, remembers prior findings, merge gate.",
+      "super-build": "Builder lane: worktree, smallest safe change, tests, branch (draft PR in gate mode).",
+      "super-qa": "Tester lane: evidence, test-gap check, screenshots, repairs new failures itself.",
+      "super-review": "Reviewer lane: merge gate, or Codex-bot mode: raise PR ready, confirm merge.",
+      "super-pr-loop": "Codex-bot loop: verify, fix, defer, resolve each thread; the repo or a human merges.",
       "pr-security-review": "Security pass on every PR diff; super-qa runs it, findings fail QA."
     }
   }

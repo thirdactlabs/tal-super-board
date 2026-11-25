@@ -58,7 +58,7 @@
 # head it reads on entry and warns.
 #
 # `--subject` / `--body-file` set the squash commit message (writing-standard.md
-# § 1): subject = the PR title (`🐛 [fix] receipts: …`), body = the commit bullets
+# § 1): subject = the PR title (`[fix] receipts: …`), body = the commit bullets
 # plus `Closes #N`. Without them GitHub writes its own message.
 #
 # `--lock-timeout` is how long THIS caller waits for its turn. `--stale-after` is
@@ -79,18 +79,18 @@
 #      schema, a diff over auto_max_lines — default 400, "big PR — please
 #      review" — or merge_policy.default "human"). Stdout lists each
 #      `human-gate: <category> — <evidence>`. Nothing ran, nothing merged; the
-#      card → Blocked with the 🙋 template: the human reviews and merges it, or
+#      card → Blocked with the template: the human reviews and merges it, or
 #      comments "done" after its pinned request to approve — the next wave re-runs
 #      the gate, which then skips the policy check and merges.
 #   9  verification-readiness: repair config.verify_commands and restart; preserve
 #      card/worktree/approval state. Never bounce to Build or retry a rebase.
 #   79 required GitHub evidence unavailable: local run halt; preserve card and
 #      approval state, stop dispatch, and explicitly restart after diagnosis.
-#   8  🙋 needs you — the PR has migrations for a database the robot may not
+#   8  needs you — the PR has migrations for a database the robot may not
 #      touch (merge_policy → migrations.allowed_envs), an allowed migrate command
 #      failed, or a human-only step is declared (`needs-you:` line in the PR body,
 #      or migrations.human_steps). Stdout lists the exact commands as
-#      `needs-you: <command>` lines. Card → Blocked with the 🙋 template; once the
+#      `needs-you: <command>` lines. Card → Blocked with the template; once the
 #      current request has verified trusted-human approval, the gate re-runs and
 #      merges.
 #
@@ -316,7 +316,7 @@ if [ "${#NEEDS[@]}" -gt 0 ]; then
   else
     for n in "${NEEDS[@]}"; do echo "needs-you: $n"; done
     approval_request
-    say "🙋 needs you before this merges — card → Blocked with the commands above"
+    say "needs you before this merges — card → Blocked with the commands above"
     exit 8
   fi
 fi

@@ -58,7 +58,10 @@
 #
 # Usage:
 #   super-board-wave-plan.sh --config <config.json> [--items <project-items.json>]
-#                            [--deps <deps.json>]
+#                            [--deps <deps.json>] [--check-awaiting]
+# A Review card labelled `awaiting-merge` (PR ready, repo has no auto-merge, a human merges) is left
+# out of `cards` and listed in `awaiting`, so a run can drain. `--check-awaiting` (the orchestrator
+# passes it on wave 1 only) puts those cards back in, so the Reviewer closes any that merged.
 # Without --items, fetches live board state via super-board-card.sh items — the
 # item-list shape for ~1 GraphQL point per 100 cards, where `gh project item-list`
 # spends 101 per 100 (fieldValues x four nested connections).
@@ -71,15 +74,17 @@
 #     "resume": [ {"number":51,"title":"…"} ],
 #     "refreshApproval": [ {"number":52,"title":"…","why":"PR head changed after review"} ],
 #     "flag":  [ {"number":82,"title":"…","why":"…"} ],
+#     "awaiting": [ {"number":45,"title":"…"} ],
 #     "stranded": [ {"number":44,"title":"…"} ] }
 set -euo pipefail
 
-CONFIG=""; ITEMS_FILE=""; DEPS_FILE=""
+CONFIG=""; ITEMS_FILE=""; DEPS_FILE=""; CHECK_AWAITING=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --config) CONFIG="$2"; shift 2 ;;
     --items)  ITEMS_FILE="$2"; shift 2 ;;
     --deps)   DEPS_FILE="$2"; shift 2 ;;
+    --check-awaiting) CHECK_AWAITING=1; shift ;;
     *) echo "unknown arg: $1" >&2; exit 64 ;;
   esac
 done
@@ -132,7 +137,7 @@ fi
 # auto-merges into one base branch race. That guard now lives where the race
 # actually is — the merge step takes a lock inside the wave workflow and the
 # freshness gate re-verifies under it — so reviews may run in parallel here.
-echo "$ITEMS" | jq --argjson cols "$COLUMNS" --argjson cap "$MAX_WORKERS" --argjson deps "$DEPS" '
+echo "$ITEMS" | jq --argjson cols "$COLUMNS" --argjson cap "$MAX_WORKERS" --argjson deps "$DEPS" --argjson check "$CHECK_AWAITING" '
   def dep($n): $deps[($n | tostring)];
   # gh project item-list puts label names on the item (`labels`); some shapes put
   # them on the content, as strings or {name}. Lower-cased, names only.
@@ -156,7 +161,8 @@ echo "$ITEMS" | jq --argjson cols "$COLUMNS" --argjson cap "$MAX_WORKERS" --argj
   # In flight: already past preflight, so the graph does not gate them. Iterated
   # in $cols order (Review, then QA) rather than board order, so a throttled wave
   # spends its slots on the work closest to Done.
-  | [ $cols[] as $c | $all[] | select(.status == $c and $c != "Ready") ] as $flight
+  | [ $cols[] as $c | $all[] | select(.status == $c and $c != "Ready")
+      | select($check == 1 or (.status != "Review") or ((.labels | index("awaiting-merge")) | not)) ] as $flight
 
   # Ready: only the ones the graph says are actually free.
   | [ $all[] | select(.status == "Ready") | select(free(.number)) ] as $ready
@@ -192,6 +198,10 @@ echo "$ITEMS" | jq --argjson cols "$COLUMNS" --argjson cap "$MAX_WORKERS" --argj
                | select(.status as $s | ["Ready","Blocked"] | index($s))
                | select(dep(.number) != null and (dep(.number).parseable | not))
                | { number, title, why: (dep(.number) | .why) } ],
+
+      # Review cards parked on a human merge (label awaiting-merge). Not planned, reported.
+      awaiting: [ $all[] | select(.status == "Review") | select(.labels | index("awaiting-merge"))
+                  | { number, title } ],
 
       # Building with no claim between waves = no live worker. Back to Ready.
       stranded: [ $all[] | select(.status == "Building") | { number, title } ] }'

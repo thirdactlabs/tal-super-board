@@ -16,7 +16,7 @@ The only local artifact this verb produces is
 ## Intro shown when lint starts
 
 ```
-🧹 super-board lint
+super-board lint
 ─────────────────────────────────────────────────────────
 Purpose: clarify your tickets BEFORE the autonomous loop runs.
 
@@ -24,7 +24,7 @@ Why: when `super-board run` dispatches headless workers, those workers
 can't ask you questions. If an issue is vague, they hallucinate.
 Lint catches vague issues now, while you can still answer.
 
-Progress: ✅ onboard  →  🧹 lint (you are here)  →  🤖 run (next)
+Progress: onboard  →  lint (you are here)  →  run (next)
 ─────────────────────────────────────────────────────────
 ```
 
@@ -39,7 +39,7 @@ PHASE 0 — Pick config
   └─ 2+ configs → list by description, ask which
 
 PHASE 1 — Confirm GitHub project
-  "🎯 Linting: <project title> (#<number>) under <owner>
+  "Linting: <project title> (#<number>) under <owner>
    Columns to scan: Ready, Building, QA, Review
    Labels: qa · bug · feature (a card with none is built; lint proposes one)
    Proceed? (y/n)"
@@ -52,7 +52,7 @@ PHASE 2 — Read the project, then ask "do I understand it?"
 
 PHASE 3 — Scan summary (flag only what needs work)
   ├─ Score each issue (silent pass): clear / vague / missing
-  ├─ Show one-line goal: "🎯 What this board is collectively trying to do: ..."
+  ├─ Show one-line goal: "What this board is collectively trying to do: ..."
   └─ Show flagged count + IDs: "4 issues need your attention: #12, #19, #23, #31"
 
 PHASE 4 — Deep-dive flagged issues (skill-routed, PM voice, one at a time)
@@ -95,11 +95,11 @@ An issue is flagged if any of these apply. An issue can fail multiple criteria; 
 | 8 | Ambiguous scope (`etc.`, `TODO`, `TBD`) | "Tabs, dropdowns, modals, etc." | Enumerate or split |
 | 9 | Multiple unrelated features bundled (>3 disconnected ACs) | Auth + billing + UI polish in one ticket | Recommend splitting |
 | 10 | Title ↔ body mismatch | Title says login, body says signup | Ask which is correct |
-| 11 | Out-of-scope vs PROJECT.md | AC for a feature the project explicitly excludes | Drop it (close as not planned, Done, 🤷) or rewrite |
+| 11 | Out-of-scope vs PROJECT.md | AC for a feature the project explicitly excludes | Drop it (close as not planned, Done, out-of-scope) or rewrite |
 | 12 | Sub-agent ambiguity flag | "this could mean ≥2 different things" | Surface both interpretations |
 | 13 | `## Blocked by` missing, empty, or unparseable | No section; or `- None — but #26 must merge first` | Rewrite to `- #N — why` bullets, or a bare `- None.` |
 | 14 | An AC proves behaviour against a fake, and no card owns the real thing | "proven with a fake repository, no database" | Name the ticket that builds it, or offer to file one |
-| 15 | Too big: likely over ~400 changed lines (`merge_policy.auto_max_lines`), or spans many areas | "Add billing page, webhook handler, admin UI and email templates" | Hold with ❓ and split via `/to-tickets` into vertical slices |
+| 15 | Too big: likely over ~400 changed lines (`merge_policy.auto_max_lines`), or spans many areas | "Add billing page, webhook handler, admin UI and email templates" | Hold with and split via `/to-tickets` into vertical slices |
 | 16 | Ticket sections missing (writing-standard.md § 3): `## Problem`, `## Context`, `## Fix`, `## Risk` — and `## Evidence` (the folded 12-row table) on a bug | Body has "What to build" and ACs only | Rewrite into the ticket format; draft Problem/Fix from the body, ask for Who and Risk |
 | 17 | Acceptance Criteria not a checklist | ACs as prose or plain `-` bullets | Rewrite as `- [ ] <checkable outcome>`, one per line |
 | 18 | Context steps not lettered under Where, more than one step per line, or chained with arrows | "Where: /x — sign in → open Receipts → drop file" | Rewrite as `- **Where:** …` then `  - a. Sign in` / `  - b. …`, one per line; embed the screenshot (raw URL pinned to a sha), never link it |
@@ -147,7 +147,7 @@ is not.
 
 Small pull requests are a design goal: each ticket should land as one PR under the merge size cap
 (`merge_policy.auto_max_lines`, default 400 changed lines; lockfiles, generated files, snapshots and
-migration SQL do not count). A PR over the cap is never auto-merged — it parks in Blocked 🙋 as a
+migration SQL do not count). A PR over the cap is never auto-merged — it parks in Blocked as a
 "big PR". Catching it at lint time is cheaper than splitting a finished branch.
 
 Flag a ticket as **too big** when either holds:
@@ -157,7 +157,7 @@ Flag a ticket as **too big** when either holds:
 - **Spans many areas** — touches three or more separate areas (say UI, API, database, background
   job, email) where each could ship and be checked alone.
 
-What lint does: hold the ticket with ❓ (Blocked, `block-template.md`, reason "too big — split
+What lint does: hold the ticket with (Blocked, `block-template.md`, reason "too big — split
 first") and offer to split it with `/to-tickets` into vertical slices — each slice thin end to end,
 independently mergeable, under the cap, with its own ACs and a `## Blocked by` line. The original
 ticket closes, or becomes the first slice, once the user approves the split.
@@ -201,10 +201,10 @@ Per-issue interaction example:
 ─────────────────────────────────────────────────────────
 #19  "Make the chat snappier"             Column: Ready
 ─────────────────────────────────────────────────────────
-🚩 "Snappier" isn't measurable. A worker won't know
+"Snappier" isn't measurable. A worker won't know
    when it's done.
 
-💡 Suggested fix (what we'll check):
+Suggested fix (what we'll check):
    1. First reply shows up in under half a second
    2. Page doesn't jump while reply is streaming
    3. Long messages don't break the layout
@@ -220,17 +220,17 @@ Per-issue interaction example:
 Sub-agent scans all linted issues + PROJECT.md to extract operational requirements:
 
 ```
-🔑 Credentials the loop will need:
+Credentials the loop will need:
    [ ] OPENAI_API_KEY (issues #14, #19)
    [ ] Test user login: testuser@example.com (issue #23)
    [ ] Stripe test secret key (issue #31)
 
-🛠  Tools the loop will need:
+Tools the loop will need:
    [✓] gh CLI authenticated (verified)
    [ ] Playwright Chromium → run: `npx playwright install chromium`
    [✓] Node 20+ (verified)
 
-🌐 Environment:
+Environment:
    [✓] Target URL reachable: https://chatbot.ai-sdk.dev (200 OK)
    [ ] .env.local has OPENAI_API_KEY set
 ```
@@ -244,14 +244,14 @@ Saved to `docs/super-board/pre-flight.md`. Each `[ ]` is a halt gate for `super-
 ## Phase 7 — final summary template
 
 ```
-✅ Lint complete:
+Lint complete:
    • 23 already clear
    • 3 ACs added (approved)
    • 1 moved to Blocked
    • 0 dropped (closed as not planned)
 
-💾 All changes saved to GitHub (no local commits needed).
-🔄 Reset this session, then run `super-board run` to start the loop.
+All changes saved to GitHub (no local commits needed).
+Reset this session, then run `super-board run` to start the loop.
 ```
 
 ---
@@ -273,8 +273,8 @@ Before declaring lint complete, the worker MUST verify all three:
 - [ ] `docs/super-board/pre-flight.md` exists and lists every credential / tool / env signal encountered while scanning issues + PROJECT.md.
 - [ ] Every issue in active-pipeline columns (Ready, Building, QA, Review) either:
   - has a populated `## Acceptance Criteria` section that passes all 19 criteria (conditional #19 only when triggered), OR
-  - was dropped on purpose (closed as not planned, Done, `🤷 dropped` comment), OR
-  - carries a `🛡 Blocked` comment naming the human-gated blocker.
+  - was dropped on purpose (closed as not planned, Done, `dropped` comment), OR
+  - carries a `Blocked` comment naming the human-gated blocker.
 - [ ] No issue is left in an in-between state (flagged but not resolved, partially edited, or awaiting user input that never came).
 
 If any check fails, do **not** print the Phase 7 success banner. Re-enter the loop on the unresolved issues, or halt with a clear "N issues still need attention" message so the user can re-run `super-board lint`.

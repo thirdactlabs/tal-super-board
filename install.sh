@@ -55,7 +55,7 @@ TARGET="${TARGET:-$PWD}"
 # Primary: the board and its lanes. Secondary: standalone helpers the lanes
 # can call (visual, git-sync, ui-refine-loop, pr-security-review). Worktree cleanup (cleanup-wt) is a
 # hook, not a skill: it ships with the guard hooks below.
-PRIMARY_SKILLS="super-board super-build super-qa super-review super-collect"
+PRIMARY_SKILLS="super-board super-build super-qa super-review super-collect super-ticket super-pr-loop"
 SECONDARY_SKILLS="visual git-sync ui-refine-loop pr-security-review"
 
 if [ ! -d "$TARGET" ]; then

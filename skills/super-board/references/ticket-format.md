@@ -24,7 +24,7 @@ it into the target's `docs/agents/issue-tracker.md` under `## Ticket format` (th
 - [ ] <checkable outcome>
 
 ## Risk
-🟢 **Low** · <one line>
+**Low** · <one line>
 
 ## Blocked by
 - #<N> — <why>          ← or exactly: - None.
@@ -32,14 +32,14 @@ it into the target's `docs/agents/issue-tracker.md` under `## Ticket format` (th
 
 | Rule | Value |
 |---|---|
-| Title | `<emoji> [<kind>] <scope>: <what>` · ≤ 70 chars · no ticket number · e.g. `🐛 [bug] receipts: spinner never stops over 10 MB` |
+| Title | `[<kind>] <scope>: <what>` · ≤ 70 chars · no ticket number · e.g. `[bug] receipts: spinner never stops over 10 MB` |
 | Context | lettered steps under Where, ONE per line · NEVER arrows · screenshot embedded for UI, NEVER linked |
 | Bugs | add `## Evidence`: the folded 12-row table (writing-standard.md § 3) · a missing row says `n/a — why` |
 | Acceptance Criteria | 2–5 `- [ ]` lines · each checkable · NEVER "works well", "is fast" |
-| Risk | 🟢 Low · 🟡 Medium · 🔴 High + one line |
+| Risk | Low · Medium · High + one line |
 | Blocked by | `- #N — why` bullets, or a bare `- None.` · NEVER "None — but #N first" |
 | Labels | `money`, `auth`, `schema` route the merge to a human (merge_policy) · `schema` = destructive only (DROP/TRUNCATE/RENAME); additive migrations need no label |
-| Human-only step | a `needs-you: <command>` line in the PR body → 🙋 Blocked until done |
+| Human-only step | a `needs-you: <command>` line in the PR body → Blocked until done |
 | Size | one card = one PR under 400 changed lines (`merge_policy.auto_max_lines`) · bigger → split with `/to-tickets` |
 
 For recurring PR fixes, keep these sections. Context names the permitting shared boundary

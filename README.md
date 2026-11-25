@@ -8,7 +8,7 @@
 
 <p>Stop babysitting coding agents: cards you drop in Ready come back as tested, reviewed PRs.</p>
 
-<p>9 skills (5 you type, 4 the board runs) · 9 commands · 6 guard hooks</p>
+<p>11 skills (6 you type, 5 the board runs) · 10 commands · 6 guard hooks</p>
 
 <p>
 <img alt="Version" src="https://img.shields.io/badge/version-3.3.0-1f883d?style=flat-square">
@@ -44,8 +44,8 @@ curl -fsSL https://raw.githubusercontent.com/EricTechPro/super-board/main/get.sh
 Or as a Claude Code plugin:
 
 ```
-/plugin marketplace add EricTechPro/super-board
-/plugin install super-board@super-board
+/plugin marketplace add thirdactlabs/tal-super-board
+/plugin install super-board@tal-super-board
 ```
 
 > [!NOTE]
@@ -103,26 +103,28 @@ Add cards to `Ready`. The board drains on its own.
 
 ## Skills
 
-**9 skills (5 you type, 4 the board runs).** Uses [Matt Pocock skills](https://github.com/mattpocock/skills), ponytail, impeccable, humanizer, [Anthropic's security review](https://github.com/anthropics/claude-code-security-review) and [Cloudflare's security-audit](https://github.com/cloudflare/security-audit-skill).
+**11 skills (6 you type, 5 the board runs).** Uses [Matt Pocock skills](https://github.com/mattpocock/skills), ponytail, impeccable, humanizer, [Anthropic's security review](https://github.com/anthropics/claude-code-security-review) and [Cloudflare's security-audit](https://github.com/cloudflare/security-audit-skill).
 
 <!-- skills:start -->
-**You type — 5 skills**
+**You type — 6 skills**
 
 | Skill | What it does |
 |---|---|
 | [`/super-board`](skills/super-board/README.md) | Orchestrator: plans waves, runs Build → QA → Review, merges when green. |
 | [`/super-collect`](skills/super-collect/README.md) | Finds problems, verifies them, writes a findings doc for /to-spec and /to-tickets. |
+| [`/super-ticket`](skills/super-ticket/README.md) | Grills you on a feature, writes board-ready tickets, files them into Backlog. |
 | [`/ui-refine-loop`](skills/ui-refine-loop/README.md) | Critique → refine loop that polishes one page or component. |
 | [`/visual`](skills/visual/README.md) | One HTML page: branch recap, plan, or codebase map with diagrams. |
 | [`/git-sync`](skills/git-sync/README.md) | Commit per logical change, merge-pull, push without force, report. |
 
-**The board runs — 4 skills**
+**The board runs — 5 skills**
 
 | Skill | What it does |
 |---|---|
-| [`/super-build`](skills/super-build/README.md) | Builder lane: worktree, smallest safe change, tests, draft PR. |
-| [`/super-qa`](skills/super-qa/README.md) | Tester lane: evidence, test-gap check, screenshots, or bounce to Build. |
-| [`/super-review`](skills/super-review/README.md) | Reviewer lane: own hypotheses, remembers prior findings, merge gate. |
+| [`/super-build`](skills/super-build/README.md) | Builder lane: worktree, smallest safe change, tests, branch (draft PR in gate mode). |
+| [`/super-qa`](skills/super-qa/README.md) | Tester lane: evidence, test-gap check, screenshots, repairs new failures itself. |
+| [`/super-review`](skills/super-review/README.md) | Reviewer lane: merge gate, or Codex-bot mode: raise PR ready, confirm merge. |
+| [`/super-pr-loop`](skills/super-pr-loop/README.md) | Codex-bot loop: verify, fix, defer, resolve each thread; the repo or a human merges. |
 | [`/pr-security-review`](skills/pr-security-review/README.md) | Security pass on every PR diff; super-qa runs it, findings fail QA. |
 <!-- skills:end -->
 
@@ -137,6 +139,7 @@ Each name links to that skill's README. Adding a skill? Write its `SKILL.md` and
 /super-board run <slug>       # drain the board
 /super-board stop             # stop workers
 /super-collect [source]       # find problems → findings doc → /to-spec
+/super-ticket                 # describe a feature → board-ready ticket in Backlog
 /ui-refine-loop <route>       # polish one page
 /visual [recap|plan|path]     # one HTML page
 /git-sync                     # commit, pull, push

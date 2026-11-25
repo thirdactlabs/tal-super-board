@@ -295,10 +295,16 @@ REASON_TABLE: list[tuple[str, str]] = [
     ("❓", "ambiguous AC"),
     ("⚙",  "infra / tooling"),
 ]
+# Block comments now carry a word tag (block-template.md); the emoji above are the legacy form.
+REASON_WORDS = {"safety": "🛡", "credentials": "🔐", "billing": "💳", "unclear": "❓"}
 
 
 def reason_for(body: str) -> tuple[str, str]:
     """Pick the leading reason emoji from a comment body; fall back to 🚫."""
+    m = re.search(r"Reason tag:[ \t]*([a-z-]+)", body)
+    if m and m.group(1) in REASON_WORDS:
+        em = REASON_WORDS[m.group(1)]
+        return em, dict(REASON_TABLE)[em]
     for em, txt in REASON_TABLE:
         if em in body:
             return em, txt

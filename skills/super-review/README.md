@@ -6,7 +6,7 @@ The Reviewer: decides whether a PR is safe to merge, and merges it through the g
 
 - **Forms its own view first.** It reads the ACs and the raw diff and writes 2-4 hypotheses before it reads the builder's summary, then checks the builder's claims like any other lead.
 - **Remembers the last review.** On a re-review it loads the previous report, marks every finding `fixed`, `not fixed` or `no longer applies` with file:line proof, and bounces again on anything unfixed. A resolved thread is not proof.
-- **Classes every finding**: Gap, Bug, Verification miss, Scope drift, or Over-engineering (from `ponytail:ponytail-review`; Should fix at most, never blocks alone). Checks that held go on the `✅ Done` line, gaps on `❌ Not done`.
+- **Classes every finding**: Gap, Bug, Verification miss, Scope drift, or Over-engineering (from `ponytail:ponytail-review`; Should fix at most, never blocks alone). Checks that held go on the `Done` line, gaps on `Not done`.
 - **Re-runs the Tester's tests** and, on non-trivial diffs, runs an adversarial truth-check with two sub-agents.
 - **Merges through `super-board-merge-gate.sh`**, pinned to the head it reviewed. A push after review voids the evidence.
 - **Files shape problems** in the diff to `Backlog` as refactor cards; it never blocks a card on them.
@@ -20,8 +20,8 @@ The Reviewer: decides whether a PR is safe to merge, and merges it through the g
 
 ```
 <!-- super-review:report -->
-[reviewer] [report] <✅ merge-ready | ❌ bounced | 🛑 blocked | 🙋 human-gated> · round <N>
-Did · ✅ Done · ❌ Not done · Next
+[reviewer] [report] <merge-ready | bounced | blocked | human-gated> · round <N>
+Did · Done · Not done · Next
 | ID | Owner | Class | Where | Finding | Status |
 ```
 

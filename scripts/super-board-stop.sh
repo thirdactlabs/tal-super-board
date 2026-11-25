@@ -100,10 +100,10 @@ post_stop_comment() {
   pr=$(pr_for_issue "$issue" || echo "")
 
   # Comment format: writing-standard.md § 4.
-  body="[orchestrator] [report] 🛑 stopped · ${lane:-unknown} lane
+  body="[orchestrator] [report] stopped · ${lane:-unknown} lane
 Did: \`super-board stop\` ended worker PID ${pid:-unknown} at ${TS}
-✅ Done: resume point is the last pushed commit — ${commit}
-❌ Not done: interrupted work may be uncommitted; inspect the preserved worktree
+Done: resume point is the last pushed commit — ${commit}
+Not done: interrupted work may be uncommitted; inspect the preserved worktree
 Next: preserve edits before \`super-board run ${CONFIG_SLUG}\`; dirty or legacy worktrees need inspection"
 
   gh issue comment "$issue" --body "$body" >/dev/null 2>&1 \

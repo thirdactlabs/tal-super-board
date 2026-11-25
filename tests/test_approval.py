@@ -52,6 +52,12 @@ class ApprovalTests(unittest.TestCase):
     def test_new_block_invalidates_old_done_even_without_marker(self):
         self.assertFalse(self.check(evidence() + [comment("Reason tag: 🙋 needs a new decision", 3)])["approved"])
 
+    def test_word_tag_is_a_block_and_needs_your_is_not(self):
+        word = [comment("Reason tag: needs-you\n" + approval.marker(REQUEST), 1), comment("done", 2)]
+        self.assertTrue(self.check(word)["approved"])
+        self.assertFalse(self.check(word + [comment("Reason tag: needs-you · a new decision", 3)])["approved"])
+        self.assertTrue(self.check(word + [comment("Reason tag: human-review · needs your call", 3)])["approved"])
+
     def test_new_request_requires_new_done(self):
         newer = evidence() + [comment(approval.marker(REQUEST), 3)]
         self.assertFalse(self.check(newer)["approved"])

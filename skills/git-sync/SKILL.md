@@ -38,7 +38,7 @@ skip a hook (`--no-verify`).
 1. The host's `AGENTS.md`, `CLAUDE.md` or `CONTRIBUTING.md` defines a commit format: follow it
    (for example `#N: type: description`).
 2. Otherwise use section "1 · Commit" of the super-board writing standard
-   (`.claude/skills/super-board/references/writing-standard.md`): emoji, `[type]`, scope,
+   (`.claude/skills/super-board/references/writing-standard.md`): `[type]`, scope,
    subject, 1–4 bullets, `Closes #N` when the commit finishes a ticket.
 3. Keep any attribution trailer the session asks for.
 

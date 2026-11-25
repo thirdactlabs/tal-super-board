@@ -153,4 +153,13 @@ OUT19=$("$PLAN" --config <(echo "$NOCAP") --items "$ITEMS" --deps <(jq '.["21"].
 echo "$OUT19" | jq -e '[.refreshApproval[].number] == [21]' >/dev/null || fail "stale approval must get a fresh request"
 echo "$OUT19" | jq -e '[.resume[].number, .cards[].number, .sweep[].number] | index(21) == null' >/dev/null || fail "refresh is not permission to merge or build"
 
-echo "PASS: test-wave-plan.sh (19 scenarios)"
+# 20 - a Review card labelled awaiting-merge (#10) is parked on a human merge: left out of the
+#      wave and listed in `awaiting`; --check-awaiting puts it back for one check.
+ITEMS20=$(mktemp); jq '(.items[] | select(.content.number == 10)) |= (.labels = ["awaiting-merge"])' "$ITEMS" > "$ITEMS20"
+OUT20=$("$PLAN" --config <(echo "$NOCAP") --items "$ITEMS20" --deps "$DEPS")
+echo "$OUT20" | jq -e '([.cards[].number] | index(10) == null) and ([.awaiting[].number] == [10])' >/dev/null || fail "awaiting-merge card must be parked: $OUT20"
+OUT20B=$("$PLAN" --config <(echo "$NOCAP") --items "$ITEMS20" --deps "$DEPS" --check-awaiting)
+echo "$OUT20B" | jq -e '[.cards[].number] | index(10) != null' >/dev/null || fail "--check-awaiting must include it: $OUT20B"
+rm -f "$ITEMS20"
+
+echo "PASS: test-wave-plan.sh (20 scenarios)"

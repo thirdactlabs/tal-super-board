@@ -93,7 +93,7 @@
   // Names of the Status options on the project, always all seven (v3.0.0).
   // Aliases tolerated; canonicalized at read time. There is no Skipped column:
   // a card dropped on purpose is closed as not planned and moved to Done with a
-  // 🤷 comment. Onboard adds any missing option and keeps every card.
+  // comment. Onboard adds any missing option and keeps every card.
   "columns": ["Backlog", "Ready", "Building", "QA", "Review", "Blocked", "Done"],
 
   // The three type labels (v3.0.0). Onboard creates them on the repo. Routing:
@@ -123,6 +123,12 @@
   // and nothing lands. See references/run-workflow.md → "Mid-run permission prompts".
   "human_approves_merge": false,
 
+  // Who reviews and merges (opt-in). "gate" (default): the Reviewer reviews and merges through
+  // super-board-merge-gate.sh. "codex-bot": the Reviewer raises the PR ready after QA and review; if the repo has a
+  // Codex review, /super-pr-loop fixes its findings; the repo's own auto-merge, or a human, merges
+  // (references/codex-bot-review.md). Nothing is installed and neither Codex nor auto-merge is required.
+  "pr_review": "gate",
+
   // Who merges what (v2.6.0). Evaluated by super-board-merge-gate.sh (via
   // super-board-merge-policy.py) on every merge; `human_approves_merge: true`
   // still overrides it and makes the Reviewer stop before the gate.
@@ -138,7 +144,7 @@
     // Onboard recommends "human" when base_branch is production-detected.
     "default": "auto",
     // Small PRs by design. A PR with more changed lines (additions +
-    // deletions) than this waits for a human: Blocked 🙋 "big PR — please
+    // deletions) than this waits for a human: Blocked "big PR — please
     // review". Default 400; 0 = no size cap. Files matching size_exclude and
     // migration files (migrations.globs) do not count; migration lines are
     // reported separately. Builders keep PRs under this cap and lint flags
@@ -156,7 +162,7 @@
     ],
     // ALWAYS human, whatever `default` says. A PR matching ANY label, path glob
     // or keyword (case-insensitive, searched in the diff's ADDED lines only) of
-    // a category exits the gate 7: no merge, card → Blocked 🙋 (the human merges
+    // a category exits the gate 7: no merge, card → Blocked (the human merges
     // it, or comments "done" to approve and the next wave merges).
     // Setting this key replaces the whole default set; {} turns it off.
     // Globs: `**/` = any dirs (incl. none), `**` = anything, `*` = one segment.
@@ -184,7 +190,7 @@
   // Database migrations at merge time (v2.6.0). A PR touching `globs` is a
   // migration PR. Inside the merge lock, after verify_commands pass, the gate
   // runs commands[env] for every env in allowed_envs, then merges. It exits 8
-  // (🙋 needs you → Blocked, block-template.md) instead when: target_env is not
+  // (needs you → Blocked, block-template.md) instead when: target_env is not
   // in allowed_envs, an allowed command fails, target_env is allowed but has no
   // command, or human_steps is non-empty. A `needs-you: <command>` line in the
   // PR body does the same for any PR. A trusted human comments "done" after a
@@ -253,7 +259,7 @@
 
   // Minimum aggregated sub-agent confidence (0-100) required to approve.
   // Default `70`. Below threshold, Reviewer must NOT approve; card moves to
-  // Blocked with `🛡 truth-check failed (confidence X/100)`. See §7.
+  // Blocked with `truth-check failed (confidence X/100)`. See §7.
   "truth_threshold": 70,
 
   // Shell commands proving the branch still BUILDS against the base branch as it
@@ -395,7 +401,7 @@
       // Cap on refactor findings filed per run. Default 5.
       "max_findings": 5
     },
-    // Extra sources added in onboard's "➕ Add another source" (v3.0.0). Each
+    // Extra sources added in onboard's "Add another source" (v3.0.0). Each
     // was pinged read-only before it was saved. `/super-collect` runs them with
     // skills/super-collect/scripts/collect_custom.py, turns the output into
     // candidates and sends them through the same verifier as every other source.

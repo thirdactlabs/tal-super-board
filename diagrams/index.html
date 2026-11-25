@@ -269,8 +269,8 @@ h2{font:650 28px/1.2 var(--sans);letter-spacing:-.01em;margin:0 0 6px}
     <button type="button" role="tab" id="tab-c" aria-controls="tp-c" aria-selected="false">From a checkout</button>
   </div>
   <div class="tp" role="tabpanel" id="tp-t" aria-labelledby="tab-t"><div class="code"><code>curl -fsSL https://raw.githubusercontent.com/EricTechPro/super-board/main/get.sh | bash</code></div><p class="small" style="margin:0">Needs Claude Code, <code>gh</code>, <code>jq</code>, bash 3.2+ and Python 3. The installer checks. It also adds Matt Pocock's skills and Cloudflare's <code>security-audit</code> (skip both with <code>--no-helper-skills</code>).</p></div>
-  <div class="tp" role="tabpanel" id="tp-p" aria-labelledby="tab-p" hidden><div class="code"><code>/plugin marketplace add EricTechPro/super-board
-/plugin install super-board@super-board</code></div><p class="note">The plugin ships the skills only, <code>pr-security-review</code> included. Run <code>/super-board:super-board onboard</code>; its 🔍 Checks step adds the guard hooks, scripts, workflows and the <code>security-audit</code> skill.</p></div>
+  <div class="tp" role="tabpanel" id="tp-p" aria-labelledby="tab-p" hidden><div class="code"><code>/plugin marketplace add thirdactlabs/tal-super-board
+/plugin install super-board@tal-super-board</code></div><p class="note">The plugin ships the skills only, <code>pr-security-review</code> included. Run <code>/super-board:super-board onboard</code>; its 🔍 Checks step adds the guard hooks, scripts, workflows and the <code>security-audit</code> skill.</p></div>
   <div class="tp" role="tabpanel" id="tp-c" aria-labelledby="tab-c" hidden><div class="code"><code>git clone https://github.com/EricTechPro/super-board.git
 ./super-board/install.sh [--no-hooks] [--protect-main] /path/to/your-project</code></div></div>
   <div class="then"><span><b>Then</b> open Claude Code and run <code>/super-board onboard</code></span><span>8 steps · Enter takes the recommended answer · <a href="onboarding/">see it first</a></span></div>

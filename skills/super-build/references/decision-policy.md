@@ -189,7 +189,7 @@ Any fork you resolved at **rung 3** goes in the commit message under a
 need no trailer — the AC or the precedent is the record.
 
 ```
-🐛 [fix] orders: use the idempotency key from the request header
+[fix] orders: use the idempotency key from the request header
 
 - reuse the client's Idempotency-Key instead of minting one
 - duplicate POST returns the first order (orders.test.ts:41)

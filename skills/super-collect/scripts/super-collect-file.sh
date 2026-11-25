@@ -62,8 +62,9 @@ if [ -z "$ADOPT" ]; then
   case "$SOURCE" in
     sentry) FP_PREFIX="err|sentry|" ;; posthog) FP_PREFIX="posthog|" ;; github) FP_PREFIX="github|" ;;
     prs) FP_PREFIX="prs|" ;; architecture) FP_PREFIX="arch|" ;;
-    custom) FP_PREFIX="custom|" ;;   # onboard's "➕ Add another source": custom|<name>|<key>
-    *) die "--source must be sentry|posthog|github|prs|architecture|custom (got: ${SOURCE:-<unset>})" 64 ;;
+    custom) FP_PREFIX="custom|" ;;   # onboard's "Add another source": custom|<name>|<key>
+    ticket) FP_PREFIX="ticket|" ;;   # /super-ticket: a feature the user described, ticket|<slug>
+    *) die "--source must be sentry|posthog|github|prs|architecture|custom|ticket (got: ${SOURCE:-<unset>})" 64 ;;
   esac
   [ -n "$TITLE" ] || die "--title is required" 64
   [ -n "$FP" ]    || die "--fingerprint is required (dedupe key)" 64
@@ -266,7 +267,14 @@ if [ "$RC" -ne 0 ]; then
   python3 "$GITHUB_READ" --halt "Collector filing/placement incomplete for #${N}; reconcile before retrying"
   echo "$N"; exit 79
 fi
-tag "$N" "source:collect" "collect:${SOURCE}" ${EXTRA_LABELS[@]+"${EXTRA_LABELS[@]}"} || { RC=$?; echo "$N"; exit "$RC"; }
+if [ "$SOURCE" = ticket ]; then
+  # A user-written ticket is not a QA finding or a collected problem: label it for what it is.
+  python3 "$GITHUB_READ" --check || { RC=$?; echo "$N"; exit "$RC"; }
+  gh issue edit "$N" ${REPO_FLAG[@]+"${REPO_FLAG[@]}"} --remove-label "source:qa" >/dev/null 2>&1 || echo "warn: could not remove source:qa from #${N}" >&2
+  tag "$N" "source:ticket" ${EXTRA_LABELS[@]+"${EXTRA_LABELS[@]}"} || { RC=$?; echo "$N"; exit "$RC"; }
+else
+  tag "$N" "source:collect" "collect:${SOURCE}" ${EXTRA_LABELS[@]+"${EXTRA_LABELS[@]}"} || { RC=$?; echo "$N"; exit "$RC"; }
+fi
 if [ "$RC" -eq 0 ]; then state success "$N" || exit $?; fi
 echo "$N"
 exit "$RC"
